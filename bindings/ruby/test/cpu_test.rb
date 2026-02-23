@@ -1,40 +1,39 @@
-#
-# Copyright (c) 2009 VMware, Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
 $LOAD_PATH.unshift File.dirname(__FILE__)
-require 'helper'
+require "helper"
 
-class CpuTest < Test::Unit::TestCase
-  def check_cpu(cpu)
-    assert_gt_eq_zero cpu.user, "user"
-    assert_gt_eq_zero cpu.sys, "sys"
-    assert_gt_eq_zero cpu.idle, "idle"
-    assert_gt_eq_zero cpu.wait, "wait"
-    assert_gt_eq_zero cpu.irq, "irq"
-    assert_gt_eq_zero cpu.soft_irq, "soft_irq"
-    assert_gt_eq_zero cpu.stolen, "stolen"
-    assert_gt_zero cpu.total, "total"
-  end
+class CpuTest < Minitest::Test
+  include SigarTestHelpers
 
   def test_cpu
-    sigar = Sigar.new
-    check_cpu sigar.cpu
+    cpu = sigar.cpu
+    assert_operator cpu.user, :>=, 0
+    assert_operator cpu.sys, :>=, 0
+    assert_operator cpu.idle, :>=, 0
+    assert_operator cpu.wait, :>=, 0
+    assert_operator cpu.irq, :>=, 0
+    assert_operator cpu.soft_irq, :>=, 0
+    assert_operator cpu.stolen, :>=, 0
+    assert_operator cpu.total, :>, 0
+  end
 
-    sigar.cpu_list.each do |cpu|
-      check_cpu cpu
+  def test_cpu_list
+    list = sigar.cpu_list
+    assert_kind_of Array, list
+    refute_empty list
+
+    list.each do |cpu|
+      assert_operator cpu.total, :>, 0
     end
+  end
+
+  def test_cpu_info_list
+    list = sigar.cpu_info_list
+    assert_kind_of Array, list
+    refute_empty list
+
+    info = list.first
+    refute_empty info.vendor
+    refute_empty info.model
+    assert_operator info.total_cores, :>, 0
   end
 end

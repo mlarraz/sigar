@@ -594,7 +594,8 @@ void sigar_fs_type_get(sigar_file_system_t *fsp)
         fsp->type = SIGAR_FSTYPE_NONE;
     }
 
-    strcpy(fsp->type_name, fstype_names[fsp->type]);
+    strncpy(fsp->type_name, fstype_names[fsp->type], sizeof(fsp->type_name) - 1);
+    fsp->type_name[sizeof(fsp->type_name) - 1] = '\0';
 }
 
 

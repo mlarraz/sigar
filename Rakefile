@@ -16,7 +16,7 @@ File.open("version.properties").each { |line|
 }
 
 GEM = props['project.name']
-MAKE = (/mswin/ =~ RUBY_PLATFORM) ? 'nmake' : 'make'
+MAKE = 'make'
 
 spec = Gem::Specification.new do |s|
   s.name = GEM
@@ -26,11 +26,11 @@ spec = Gem::Specification.new do |s|
   s.author = props['project.author']
   s.email = props['project.email']
   s.homepage = props['project.homepage']
+  s.required_ruby_version = '>= 3.3'
   s.platform = Gem::Platform::RUBY
   s.extensions = 'bindings/ruby/extconf.rb'
   s.files =
     %w(LICENSE NOTICE README.md Rakefile version.properties) +
-    %w(bindings/SigarWrapper.pm bindings/SigarBuild.pm) +
     `git ls-files -- bindings/ruby/*.*`.split("\n") +
     Dir.glob("include/*.h") +
     Dir.glob("src/**/*.[ch]") +

@@ -17,11 +17,6 @@
  */
 
 #include <ruby.h>
-#ifdef RB_RUBY_19
-#include <ruby/re.h>
-#else
-#include <re.h>
-#endif
 
 #include <errno.h>
 #include <ctype.h>
@@ -33,20 +28,6 @@
 #define RB_SIGAR_RAISE(msg) rb_raise(rb_eArgError, "%s", msg)
 #define RB_SIGAR_CROAK RB_SIGAR_RAISE(sigar_strerror(sigar, status))
 #define OBJ2PID(pid) rb_sigar_pid_get(rbsigar, pid)
-
-#ifndef RSTRING_PTR
-#define RSTRING_PTR(s) RSTRING(s)->ptr
-#endif
-
-#ifndef RSTRING_LEN
-#define RSTRING_LEN(s) RSTRING(s)->len
-#endif
-
-#ifdef RB_HAS_RE_ERROR
-#  define RB_REGEX_ERROR rb_eRegexpError
-#else
-#  define RB_REGEX_ERROR rb_eArgError
-#endif
 
 #define SIGAR \
     sigar_t *sigar = rbsigar->sigar
@@ -69,28 +50,10 @@ static rb_sigar_t *rb_sigar_get(VALUE obj)
 static int rbsigar_ptql_re_impl(void *data,
                                 char *haystack, char *needle)
 {
-#ifdef RB_RUBY_19
-    /* XXX no more regex.h */
-    return 0;
-#else
-    struct re_pattern_buffer *regex;
-    int len = strlen(haystack);
-    int retval;
-    const char *err;
-
-    regex = ALLOC(struct re_pattern_buffer);
-    MEMZERO((char *)regex, struct re_pattern_buffer, 1);
-    /* XXX cache */
-    if ((err = re_compile_pattern(needle, strlen(needle), regex))) {
-        re_free_pattern(regex);
-        rb_raise(RB_REGEX_ERROR, "%s", err);
-        return 0;
-    }
-
-    retval = re_match(regex, haystack, len, 0, NULL);
-    re_free_pattern(regex);
-    return retval > 0;
-#endif
+    VALUE re = rb_reg_new(needle, strlen(needle), 0);
+    VALUE str = rb_str_new2(haystack);
+    VALUE result = rb_reg_match(re, str);
+    return !NIL_P(result);
 }
 
 #define sigar_isdigit(c) \

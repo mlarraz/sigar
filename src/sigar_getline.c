@@ -766,9 +766,9 @@ sigar_getline_windowchanged()
 
       sigar_getline_setwidth(wins.ws_col);
 
-      sprintf(lenv, "LINES=%d", wins.ws_row);
+      snprintf(lenv, sizeof(lenv), "LINES=%d", wins.ws_row);
       putenv(lenv);
-      sprintf(cenv, "COLUMNS=%d", wins.ws_col);
+      snprintf(cenv, sizeof(cenv), "COLUMNS=%d", wins.ws_col);
       putenv(cenv);
    }
 #endif
@@ -1367,7 +1367,7 @@ sigar_getline_histinit(char *file)
 
    if (!strcmp(file, "-")) return;
 
-   sprintf(gl_histfile, "%s", file);
+   snprintf(gl_histfile, sizeof(gl_histfile), "%s", file);
 
    fp = fopen(gl_histfile, "r");
    if (fp)

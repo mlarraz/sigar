@@ -1,45 +1,23 @@
-#
-# Copyright (c) 2009 VMware, Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
 $LOAD_PATH.unshift File.dirname(__FILE__)
-require 'helper'
+require "helper"
 
-class MemTest < Test::Unit::TestCase
+class MemTest < Minitest::Test
+  include SigarTestHelpers
 
   def test_mem
-    sigar = Sigar.new
     mem = sigar.mem
-    assert_gt_zero mem.total, "total"
-    assert_gt_zero mem.used, "used"
+    assert_operator mem.total, :>, 0
+    assert_operator mem.used, :>, 0
+    assert_operator mem.free, :>, 0
+    assert_operator mem.actual_used, :>, 0
+    assert_operator mem.actual_free, :>, 0
+    assert_operator mem.ram, :>, 0
+    assert_equal 0, mem.ram % 8
 
-    assert_gt_zero mem.used_percent, "used_percent"
-    assert mem.used_percent <= 100, "used_percent <= 100"
+    assert_operator mem.used_percent, :>, 0
+    assert_operator mem.used_percent, :<=, 100
 
-    assert_gt_eq_zero mem.free_percent, "free_percent"
-    assert mem.free_percent < 100, "free_percent < 100"
-
-    assert_gt_zero mem.free, "free"
-
-    assert_gt_zero mem.actual_used, "actual_used"
-
-    assert_gt_zero mem.actual_free, "actual_free"
-
-    assert_gt_zero mem.ram, "ram"
-
-    assert (mem.ram % 8) == 0
+    assert_operator mem.free_percent, :>=, 0
+    assert_operator mem.free_percent, :<, 100
   end
-
 end

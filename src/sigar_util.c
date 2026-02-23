@@ -32,7 +32,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 
-SIGAR_INLINE char *sigar_uitoa(char *buf, unsigned int n, int *len)
+char *sigar_uitoa(char *buf, unsigned int n, int *len)
 {
     char *start = buf + UITOA_BUFFER_SIZE - 1;
 
@@ -47,7 +47,7 @@ SIGAR_INLINE char *sigar_uitoa(char *buf, unsigned int n, int *len)
     return start;
 }
 
-SIGAR_INLINE char *sigar_skip_line(char *buffer, int buflen)
+char *sigar_skip_line(char *buffer, int buflen)
 {
     char *ptr = buflen ?
         (char *)memchr(buffer, '\n', buflen) : /* bleh */
@@ -55,14 +55,14 @@ SIGAR_INLINE char *sigar_skip_line(char *buffer, int buflen)
     return ++ptr;
 }
 
-SIGAR_INLINE char *sigar_skip_token(char *p)
+char *sigar_skip_token(char *p)
 {
     while (sigar_isspace(*p)) p++;
     while (*p && !sigar_isspace(*p)) p++;
     return p;
 }
 
-SIGAR_INLINE char *sigar_skip_multiple_token(char *p, int count)
+char *sigar_skip_multiple_token(char *p, int count)
 {
     int i;
     
@@ -693,7 +693,8 @@ void sigar_cpu_model_adjust(sigar_t *sigar, sigar_cpu_info_t *info)
         }
     }
 
-    strcpy(info->model, ptr);
+    strncpy(info->model, ptr, sizeof(info->model) - 1);
+    info->model[sizeof(info->model) - 1] = '\0';
 }
 
 /* attempt to derive MHz from model name

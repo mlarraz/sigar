@@ -1,0 +1,2936 @@
+static VALUE rb_cSigarUptime;
+
+static VALUE rb_sigar_uptime(VALUE obj)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_uptime_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_uptime_get(sigar, RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarUptime, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_Uptime_uptime(VALUE self)
+{
+    sigar_uptime_t *uptime;
+    Data_Get_Struct(self, sigar_uptime_t, uptime);
+    return rb_float_new(uptime->uptime);    
+}
+static VALUE rb_cSigarNetInterfaceConfig;
+
+static VALUE rb_sigar_net_interface_config(VALUE obj, VALUE name)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_net_interface_config_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_net_interface_config_get(sigar, StringValuePtr(name), RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarNetInterfaceConfig, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_NetInterfaceConfig_name(VALUE self)
+{
+    sigar_net_interface_config_t *net_interface_config;
+    Data_Get_Struct(self, sigar_net_interface_config_t, net_interface_config);
+    return rb_str_new2(net_interface_config->name);    
+}
+static VALUE rb_sigar_NetInterfaceConfig_hwaddr(VALUE self)
+{
+    sigar_net_interface_config_t *net_interface_config;
+    Data_Get_Struct(self, sigar_net_interface_config_t, net_interface_config);
+    return rb_sigar_net_address_to_s(net_interface_config->hwaddr);    
+}
+static VALUE rb_sigar_NetInterfaceConfig_type(VALUE self)
+{
+    sigar_net_interface_config_t *net_interface_config;
+    Data_Get_Struct(self, sigar_net_interface_config_t, net_interface_config);
+    return rb_str_new2(net_interface_config->type);    
+}
+static VALUE rb_sigar_NetInterfaceConfig_description(VALUE self)
+{
+    sigar_net_interface_config_t *net_interface_config;
+    Data_Get_Struct(self, sigar_net_interface_config_t, net_interface_config);
+    return rb_str_new2(net_interface_config->description);    
+}
+static VALUE rb_sigar_NetInterfaceConfig_address(VALUE self)
+{
+    sigar_net_interface_config_t *net_interface_config;
+    Data_Get_Struct(self, sigar_net_interface_config_t, net_interface_config);
+    return rb_sigar_net_address_to_s(net_interface_config->address);    
+}
+static VALUE rb_sigar_NetInterfaceConfig_address6(VALUE self)
+{
+    sigar_net_interface_config_t *net_interface_config;
+    Data_Get_Struct(self, sigar_net_interface_config_t, net_interface_config);
+    return rb_sigar_net_address_to_s(net_interface_config->address6);    
+}
+static VALUE rb_sigar_NetInterfaceConfig_prefix6_length(VALUE self)
+{
+    sigar_net_interface_config_t *net_interface_config;
+    Data_Get_Struct(self, sigar_net_interface_config_t, net_interface_config);
+    return rb_int2inum(net_interface_config->prefix6_length);    
+}
+static VALUE rb_sigar_NetInterfaceConfig_scope6(VALUE self)
+{
+    sigar_net_interface_config_t *net_interface_config;
+    Data_Get_Struct(self, sigar_net_interface_config_t, net_interface_config);
+    return rb_int2inum(net_interface_config->scope6);    
+}
+static VALUE rb_sigar_NetInterfaceConfig_destination(VALUE self)
+{
+    sigar_net_interface_config_t *net_interface_config;
+    Data_Get_Struct(self, sigar_net_interface_config_t, net_interface_config);
+    return rb_sigar_net_address_to_s(net_interface_config->destination);    
+}
+static VALUE rb_sigar_NetInterfaceConfig_broadcast(VALUE self)
+{
+    sigar_net_interface_config_t *net_interface_config;
+    Data_Get_Struct(self, sigar_net_interface_config_t, net_interface_config);
+    return rb_sigar_net_address_to_s(net_interface_config->broadcast);    
+}
+static VALUE rb_sigar_NetInterfaceConfig_netmask(VALUE self)
+{
+    sigar_net_interface_config_t *net_interface_config;
+    Data_Get_Struct(self, sigar_net_interface_config_t, net_interface_config);
+    return rb_sigar_net_address_to_s(net_interface_config->netmask);    
+}
+static VALUE rb_sigar_NetInterfaceConfig_flags(VALUE self)
+{
+    sigar_net_interface_config_t *net_interface_config;
+    Data_Get_Struct(self, sigar_net_interface_config_t, net_interface_config);
+    return rb_ll2inum(net_interface_config->flags);    
+}
+static VALUE rb_sigar_NetInterfaceConfig_mtu(VALUE self)
+{
+    sigar_net_interface_config_t *net_interface_config;
+    Data_Get_Struct(self, sigar_net_interface_config_t, net_interface_config);
+    return rb_ll2inum(net_interface_config->mtu);    
+}
+static VALUE rb_sigar_NetInterfaceConfig_metric(VALUE self)
+{
+    sigar_net_interface_config_t *net_interface_config;
+    Data_Get_Struct(self, sigar_net_interface_config_t, net_interface_config);
+    return rb_ll2inum(net_interface_config->metric);    
+}
+static VALUE rb_sigar_NetInterfaceConfig_tx_queue_len(VALUE self)
+{
+    sigar_net_interface_config_t *net_interface_config;
+    Data_Get_Struct(self, sigar_net_interface_config_t, net_interface_config);
+    return rb_int2inum(net_interface_config->tx_queue_len);    
+}
+static VALUE rb_cSigarProcExe;
+
+static VALUE rb_sigar_proc_exe(VALUE obj, VALUE pid)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_proc_exe_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_proc_exe_get(sigar, OBJ2PID(pid), RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarProcExe, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_ProcExe_name(VALUE self)
+{
+    sigar_proc_exe_t *proc_exe;
+    Data_Get_Struct(self, sigar_proc_exe_t, proc_exe);
+    return rb_str_new2(proc_exe->name);    
+}
+static VALUE rb_sigar_ProcExe_cwd(VALUE self)
+{
+    sigar_proc_exe_t *proc_exe;
+    Data_Get_Struct(self, sigar_proc_exe_t, proc_exe);
+    return rb_str_new2(proc_exe->cwd);    
+}
+static VALUE rb_cSigarDumpPidCache;
+
+static VALUE rb_sigar_dump_pid_cache(VALUE obj)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_dump_pid_cache_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_dump_pid_cache_get(sigar, RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarDumpPidCache, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_DumpPidCache_dummy(VALUE self)
+{
+    sigar_dump_pid_cache_t *dump_pid_cache;
+    Data_Get_Struct(self, sigar_dump_pid_cache_t, dump_pid_cache);
+    return rb_ll2inum(dump_pid_cache->dummy);    
+}
+static VALUE rb_sigar_NetStat_tcp_inbound_total(VALUE self)
+{
+    sigar_net_stat_t *net_stat;
+    Data_Get_Struct(self, sigar_net_stat_t, net_stat);
+    return rb_int2inum(net_stat->tcp_inbound_total);    
+}
+static VALUE rb_sigar_NetStat_tcp_outbound_total(VALUE self)
+{
+    sigar_net_stat_t *net_stat;
+    Data_Get_Struct(self, sigar_net_stat_t, net_stat);
+    return rb_int2inum(net_stat->tcp_outbound_total);    
+}
+static VALUE rb_sigar_NetStat_all_inbound_total(VALUE self)
+{
+    sigar_net_stat_t *net_stat;
+    Data_Get_Struct(self, sigar_net_stat_t, net_stat);
+    return rb_int2inum(net_stat->all_inbound_total);    
+}
+static VALUE rb_sigar_NetStat_all_outbound_total(VALUE self)
+{
+    sigar_net_stat_t *net_stat;
+    Data_Get_Struct(self, sigar_net_stat_t, net_stat);
+    return rb_int2inum(net_stat->all_outbound_total);    
+}
+static VALUE rb_cSigarFileSystemUsage;
+
+static VALUE rb_sigar_file_system_usage(VALUE obj, VALUE name)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_file_system_usage_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_file_system_usage_get(sigar, StringValuePtr(name), RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarFileSystemUsage, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_FileSystemUsage_total(VALUE self)
+{
+    sigar_file_system_usage_t *file_system_usage;
+    Data_Get_Struct(self, sigar_file_system_usage_t, file_system_usage);
+    return rb_ll2inum(file_system_usage->total);    
+}
+static VALUE rb_sigar_FileSystemUsage_free(VALUE self)
+{
+    sigar_file_system_usage_t *file_system_usage;
+    Data_Get_Struct(self, sigar_file_system_usage_t, file_system_usage);
+    return rb_ll2inum(file_system_usage->free);    
+}
+static VALUE rb_sigar_FileSystemUsage_used(VALUE self)
+{
+    sigar_file_system_usage_t *file_system_usage;
+    Data_Get_Struct(self, sigar_file_system_usage_t, file_system_usage);
+    return rb_ll2inum(file_system_usage->used);    
+}
+static VALUE rb_sigar_FileSystemUsage_avail(VALUE self)
+{
+    sigar_file_system_usage_t *file_system_usage;
+    Data_Get_Struct(self, sigar_file_system_usage_t, file_system_usage);
+    return rb_ll2inum(file_system_usage->avail);    
+}
+static VALUE rb_sigar_FileSystemUsage_files(VALUE self)
+{
+    sigar_file_system_usage_t *file_system_usage;
+    Data_Get_Struct(self, sigar_file_system_usage_t, file_system_usage);
+    return rb_ll2inum(file_system_usage->files);    
+}
+static VALUE rb_sigar_FileSystemUsage_free_files(VALUE self)
+{
+    sigar_file_system_usage_t *file_system_usage;
+    Data_Get_Struct(self, sigar_file_system_usage_t, file_system_usage);
+    return rb_ll2inum(file_system_usage->free_files);    
+}
+static VALUE rb_sigar_FileSystemUsage_disk_reads(VALUE self)
+{
+    sigar_file_system_usage_t *file_system_usage;
+    Data_Get_Struct(self, sigar_file_system_usage_t, file_system_usage);
+    return rb_ll2inum(file_system_usage->disk_reads);    
+}
+static VALUE rb_sigar_FileSystemUsage_disk_writes(VALUE self)
+{
+    sigar_file_system_usage_t *file_system_usage;
+    Data_Get_Struct(self, sigar_file_system_usage_t, file_system_usage);
+    return rb_ll2inum(file_system_usage->disk_writes);    
+}
+static VALUE rb_sigar_FileSystemUsage_disk_read_bytes(VALUE self)
+{
+    sigar_file_system_usage_t *file_system_usage;
+    Data_Get_Struct(self, sigar_file_system_usage_t, file_system_usage);
+    return rb_ll2inum(file_system_usage->disk_read_bytes);    
+}
+static VALUE rb_sigar_FileSystemUsage_disk_write_bytes(VALUE self)
+{
+    sigar_file_system_usage_t *file_system_usage;
+    Data_Get_Struct(self, sigar_file_system_usage_t, file_system_usage);
+    return rb_ll2inum(file_system_usage->disk_write_bytes);    
+}
+static VALUE rb_sigar_FileSystemUsage_disk_queue(VALUE self)
+{
+    sigar_file_system_usage_t *file_system_usage;
+    Data_Get_Struct(self, sigar_file_system_usage_t, file_system_usage);
+    return rb_float_new(file_system_usage->disk_queue);    
+}
+static VALUE rb_sigar_FileSystemUsage_disk_service_time(VALUE self)
+{
+    sigar_file_system_usage_t *file_system_usage;
+    Data_Get_Struct(self, sigar_file_system_usage_t, file_system_usage);
+    return rb_float_new(file_system_usage->disk_service_time);    
+}
+static VALUE rb_sigar_FileSystemUsage_use_percent(VALUE self)
+{
+    sigar_file_system_usage_t *file_system_usage;
+    Data_Get_Struct(self, sigar_file_system_usage_t, file_system_usage);
+    return rb_float_new(file_system_usage->use_percent);    
+}
+static VALUE rb_cSigarSwap;
+
+static VALUE rb_sigar_swap(VALUE obj)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_swap_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_swap_get(sigar, RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarSwap, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_Swap_total(VALUE self)
+{
+    sigar_swap_t *swap;
+    Data_Get_Struct(self, sigar_swap_t, swap);
+    return rb_ll2inum(swap->total);    
+}
+static VALUE rb_sigar_Swap_used(VALUE self)
+{
+    sigar_swap_t *swap;
+    Data_Get_Struct(self, sigar_swap_t, swap);
+    return rb_ll2inum(swap->used);    
+}
+static VALUE rb_sigar_Swap_free(VALUE self)
+{
+    sigar_swap_t *swap;
+    Data_Get_Struct(self, sigar_swap_t, swap);
+    return rb_ll2inum(swap->free);    
+}
+static VALUE rb_sigar_Swap_page_in(VALUE self)
+{
+    sigar_swap_t *swap;
+    Data_Get_Struct(self, sigar_swap_t, swap);
+    return rb_ll2inum(swap->page_in);    
+}
+static VALUE rb_sigar_Swap_page_out(VALUE self)
+{
+    sigar_swap_t *swap;
+    Data_Get_Struct(self, sigar_swap_t, swap);
+    return rb_ll2inum(swap->page_out);    
+}
+static VALUE rb_cSigarProcMem;
+
+static VALUE rb_sigar_proc_mem(VALUE obj, VALUE pid)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_proc_mem_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_proc_mem_get(sigar, OBJ2PID(pid), RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarProcMem, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_ProcMem_size(VALUE self)
+{
+    sigar_proc_mem_t *proc_mem;
+    Data_Get_Struct(self, sigar_proc_mem_t, proc_mem);
+    return rb_ll2inum(proc_mem->size);    
+}
+static VALUE rb_sigar_ProcMem_resident(VALUE self)
+{
+    sigar_proc_mem_t *proc_mem;
+    Data_Get_Struct(self, sigar_proc_mem_t, proc_mem);
+    return rb_ll2inum(proc_mem->resident);    
+}
+static VALUE rb_sigar_ProcMem_share(VALUE self)
+{
+    sigar_proc_mem_t *proc_mem;
+    Data_Get_Struct(self, sigar_proc_mem_t, proc_mem);
+    return rb_ll2inum(proc_mem->share);    
+}
+static VALUE rb_sigar_ProcMem_minor_faults(VALUE self)
+{
+    sigar_proc_mem_t *proc_mem;
+    Data_Get_Struct(self, sigar_proc_mem_t, proc_mem);
+    return rb_ll2inum(proc_mem->minor_faults);    
+}
+static VALUE rb_sigar_ProcMem_major_faults(VALUE self)
+{
+    sigar_proc_mem_t *proc_mem;
+    Data_Get_Struct(self, sigar_proc_mem_t, proc_mem);
+    return rb_ll2inum(proc_mem->major_faults);    
+}
+static VALUE rb_sigar_ProcMem_page_faults(VALUE self)
+{
+    sigar_proc_mem_t *proc_mem;
+    Data_Get_Struct(self, sigar_proc_mem_t, proc_mem);
+    return rb_ll2inum(proc_mem->page_faults);    
+}
+static VALUE rb_cSigarNetInfo;
+
+static VALUE rb_sigar_net_info(VALUE obj)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_net_info_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_net_info_get(sigar, RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarNetInfo, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_NetInfo_default_gateway(VALUE self)
+{
+    sigar_net_info_t *net_info;
+    Data_Get_Struct(self, sigar_net_info_t, net_info);
+    return rb_str_new2(net_info->default_gateway);    
+}
+static VALUE rb_sigar_NetInfo_default_gateway_interface(VALUE self)
+{
+    sigar_net_info_t *net_info;
+    Data_Get_Struct(self, sigar_net_info_t, net_info);
+    return rb_str_new2(net_info->default_gateway_interface);    
+}
+static VALUE rb_sigar_NetInfo_host_name(VALUE self)
+{
+    sigar_net_info_t *net_info;
+    Data_Get_Struct(self, sigar_net_info_t, net_info);
+    return rb_str_new2(net_info->host_name);    
+}
+static VALUE rb_sigar_NetInfo_domain_name(VALUE self)
+{
+    sigar_net_info_t *net_info;
+    Data_Get_Struct(self, sigar_net_info_t, net_info);
+    return rb_str_new2(net_info->domain_name);    
+}
+static VALUE rb_sigar_NetInfo_primary_dns(VALUE self)
+{
+    sigar_net_info_t *net_info;
+    Data_Get_Struct(self, sigar_net_info_t, net_info);
+    return rb_str_new2(net_info->primary_dns);    
+}
+static VALUE rb_sigar_NetInfo_secondary_dns(VALUE self)
+{
+    sigar_net_info_t *net_info;
+    Data_Get_Struct(self, sigar_net_info_t, net_info);
+    return rb_str_new2(net_info->secondary_dns);    
+}
+static VALUE rb_cSigarNfsServerV2;
+
+static VALUE rb_sigar_nfs_server_v2(VALUE obj)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_nfs_server_v2_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_nfs_server_v2_get(sigar, RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarNfsServerV2, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_NfsServerV2_null(VALUE self)
+{
+    sigar_nfs_server_v2_t *nfs_server_v2;
+    Data_Get_Struct(self, sigar_nfs_server_v2_t, nfs_server_v2);
+    return rb_ll2inum(nfs_server_v2->null);    
+}
+static VALUE rb_sigar_NfsServerV2_getattr(VALUE self)
+{
+    sigar_nfs_server_v2_t *nfs_server_v2;
+    Data_Get_Struct(self, sigar_nfs_server_v2_t, nfs_server_v2);
+    return rb_ll2inum(nfs_server_v2->getattr);    
+}
+static VALUE rb_sigar_NfsServerV2_setattr(VALUE self)
+{
+    sigar_nfs_server_v2_t *nfs_server_v2;
+    Data_Get_Struct(self, sigar_nfs_server_v2_t, nfs_server_v2);
+    return rb_ll2inum(nfs_server_v2->setattr);    
+}
+static VALUE rb_sigar_NfsServerV2_root(VALUE self)
+{
+    sigar_nfs_server_v2_t *nfs_server_v2;
+    Data_Get_Struct(self, sigar_nfs_server_v2_t, nfs_server_v2);
+    return rb_ll2inum(nfs_server_v2->root);    
+}
+static VALUE rb_sigar_NfsServerV2_lookup(VALUE self)
+{
+    sigar_nfs_server_v2_t *nfs_server_v2;
+    Data_Get_Struct(self, sigar_nfs_server_v2_t, nfs_server_v2);
+    return rb_ll2inum(nfs_server_v2->lookup);    
+}
+static VALUE rb_sigar_NfsServerV2_readlink(VALUE self)
+{
+    sigar_nfs_server_v2_t *nfs_server_v2;
+    Data_Get_Struct(self, sigar_nfs_server_v2_t, nfs_server_v2);
+    return rb_ll2inum(nfs_server_v2->readlink);    
+}
+static VALUE rb_sigar_NfsServerV2_read(VALUE self)
+{
+    sigar_nfs_server_v2_t *nfs_server_v2;
+    Data_Get_Struct(self, sigar_nfs_server_v2_t, nfs_server_v2);
+    return rb_ll2inum(nfs_server_v2->read);    
+}
+static VALUE rb_sigar_NfsServerV2_writecache(VALUE self)
+{
+    sigar_nfs_server_v2_t *nfs_server_v2;
+    Data_Get_Struct(self, sigar_nfs_server_v2_t, nfs_server_v2);
+    return rb_ll2inum(nfs_server_v2->writecache);    
+}
+static VALUE rb_sigar_NfsServerV2_write(VALUE self)
+{
+    sigar_nfs_server_v2_t *nfs_server_v2;
+    Data_Get_Struct(self, sigar_nfs_server_v2_t, nfs_server_v2);
+    return rb_ll2inum(nfs_server_v2->write);    
+}
+static VALUE rb_sigar_NfsServerV2_create(VALUE self)
+{
+    sigar_nfs_server_v2_t *nfs_server_v2;
+    Data_Get_Struct(self, sigar_nfs_server_v2_t, nfs_server_v2);
+    return rb_ll2inum(nfs_server_v2->create);    
+}
+static VALUE rb_sigar_NfsServerV2_remove(VALUE self)
+{
+    sigar_nfs_server_v2_t *nfs_server_v2;
+    Data_Get_Struct(self, sigar_nfs_server_v2_t, nfs_server_v2);
+    return rb_ll2inum(nfs_server_v2->remove);    
+}
+static VALUE rb_sigar_NfsServerV2_rename(VALUE self)
+{
+    sigar_nfs_server_v2_t *nfs_server_v2;
+    Data_Get_Struct(self, sigar_nfs_server_v2_t, nfs_server_v2);
+    return rb_ll2inum(nfs_server_v2->rename);    
+}
+static VALUE rb_sigar_NfsServerV2_link(VALUE self)
+{
+    sigar_nfs_server_v2_t *nfs_server_v2;
+    Data_Get_Struct(self, sigar_nfs_server_v2_t, nfs_server_v2);
+    return rb_ll2inum(nfs_server_v2->link);    
+}
+static VALUE rb_sigar_NfsServerV2_symlink(VALUE self)
+{
+    sigar_nfs_server_v2_t *nfs_server_v2;
+    Data_Get_Struct(self, sigar_nfs_server_v2_t, nfs_server_v2);
+    return rb_ll2inum(nfs_server_v2->symlink);    
+}
+static VALUE rb_sigar_NfsServerV2_mkdir(VALUE self)
+{
+    sigar_nfs_server_v2_t *nfs_server_v2;
+    Data_Get_Struct(self, sigar_nfs_server_v2_t, nfs_server_v2);
+    return rb_ll2inum(nfs_server_v2->mkdir);    
+}
+static VALUE rb_sigar_NfsServerV2_rmdir(VALUE self)
+{
+    sigar_nfs_server_v2_t *nfs_server_v2;
+    Data_Get_Struct(self, sigar_nfs_server_v2_t, nfs_server_v2);
+    return rb_ll2inum(nfs_server_v2->rmdir);    
+}
+static VALUE rb_sigar_NfsServerV2_readdir(VALUE self)
+{
+    sigar_nfs_server_v2_t *nfs_server_v2;
+    Data_Get_Struct(self, sigar_nfs_server_v2_t, nfs_server_v2);
+    return rb_ll2inum(nfs_server_v2->readdir);    
+}
+static VALUE rb_sigar_NfsServerV2_fsstat(VALUE self)
+{
+    sigar_nfs_server_v2_t *nfs_server_v2;
+    Data_Get_Struct(self, sigar_nfs_server_v2_t, nfs_server_v2);
+    return rb_ll2inum(nfs_server_v2->fsstat);    
+}
+static VALUE rb_cSigarNfsClientV3;
+
+static VALUE rb_sigar_nfs_client_v3(VALUE obj)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_nfs_client_v3_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_nfs_client_v3_get(sigar, RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarNfsClientV3, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_NfsClientV3_null(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->null);    
+}
+static VALUE rb_sigar_NfsClientV3_getattr(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->getattr);    
+}
+static VALUE rb_sigar_NfsClientV3_setattr(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->setattr);    
+}
+static VALUE rb_sigar_NfsClientV3_lookup(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->lookup);    
+}
+static VALUE rb_sigar_NfsClientV3_access(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->access);    
+}
+static VALUE rb_sigar_NfsClientV3_readlink(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->readlink);    
+}
+static VALUE rb_sigar_NfsClientV3_read(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->read);    
+}
+static VALUE rb_sigar_NfsClientV3_write(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->write);    
+}
+static VALUE rb_sigar_NfsClientV3_create(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->create);    
+}
+static VALUE rb_sigar_NfsClientV3_mkdir(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->mkdir);    
+}
+static VALUE rb_sigar_NfsClientV3_symlink(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->symlink);    
+}
+static VALUE rb_sigar_NfsClientV3_mknod(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->mknod);    
+}
+static VALUE rb_sigar_NfsClientV3_remove(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->remove);    
+}
+static VALUE rb_sigar_NfsClientV3_rmdir(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->rmdir);    
+}
+static VALUE rb_sigar_NfsClientV3_rename(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->rename);    
+}
+static VALUE rb_sigar_NfsClientV3_link(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->link);    
+}
+static VALUE rb_sigar_NfsClientV3_readdir(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->readdir);    
+}
+static VALUE rb_sigar_NfsClientV3_readdirplus(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->readdirplus);    
+}
+static VALUE rb_sigar_NfsClientV3_fsstat(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->fsstat);    
+}
+static VALUE rb_sigar_NfsClientV3_fsinfo(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->fsinfo);    
+}
+static VALUE rb_sigar_NfsClientV3_pathconf(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->pathconf);    
+}
+static VALUE rb_sigar_NfsClientV3_commit(VALUE self)
+{
+    sigar_nfs_client_v3_t *nfs_client_v3;
+    Data_Get_Struct(self, sigar_nfs_client_v3_t, nfs_client_v3);
+    return rb_ll2inum(nfs_client_v3->commit);    
+}
+static VALUE rb_cSigarProcDiskIO;
+
+static VALUE rb_sigar_proc_disk_io(VALUE obj, VALUE pid)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_proc_disk_io_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_proc_disk_io_get(sigar, OBJ2PID(pid), RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarProcDiskIO, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_ProcDiskIO_bytes_read(VALUE self)
+{
+    sigar_proc_disk_io_t *proc_disk_io;
+    Data_Get_Struct(self, sigar_proc_disk_io_t, proc_disk_io);
+    return rb_ll2inum(proc_disk_io->bytes_read);    
+}
+static VALUE rb_sigar_ProcDiskIO_bytes_written(VALUE self)
+{
+    sigar_proc_disk_io_t *proc_disk_io;
+    Data_Get_Struct(self, sigar_proc_disk_io_t, proc_disk_io);
+    return rb_ll2inum(proc_disk_io->bytes_written);    
+}
+static VALUE rb_sigar_ProcDiskIO_bytes_total(VALUE self)
+{
+    sigar_proc_disk_io_t *proc_disk_io;
+    Data_Get_Struct(self, sigar_proc_disk_io_t, proc_disk_io);
+    return rb_ll2inum(proc_disk_io->bytes_total);    
+}
+static VALUE rb_cSigarProcCredName;
+
+static VALUE rb_sigar_proc_cred_name(VALUE obj, VALUE pid)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_proc_cred_name_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_proc_cred_name_get(sigar, OBJ2PID(pid), RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarProcCredName, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_ProcCredName_user(VALUE self)
+{
+    sigar_proc_cred_name_t *proc_cred_name;
+    Data_Get_Struct(self, sigar_proc_cred_name_t, proc_cred_name);
+    return rb_str_new2(proc_cred_name->user);    
+}
+static VALUE rb_sigar_ProcCredName_group(VALUE self)
+{
+    sigar_proc_cred_name_t *proc_cred_name;
+    Data_Get_Struct(self, sigar_proc_cred_name_t, proc_cred_name);
+    return rb_str_new2(proc_cred_name->group);    
+}
+static VALUE rb_cSigarNfsClientV2;
+
+static VALUE rb_sigar_nfs_client_v2(VALUE obj)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_nfs_client_v2_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_nfs_client_v2_get(sigar, RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarNfsClientV2, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_NfsClientV2_null(VALUE self)
+{
+    sigar_nfs_client_v2_t *nfs_client_v2;
+    Data_Get_Struct(self, sigar_nfs_client_v2_t, nfs_client_v2);
+    return rb_ll2inum(nfs_client_v2->null);    
+}
+static VALUE rb_sigar_NfsClientV2_getattr(VALUE self)
+{
+    sigar_nfs_client_v2_t *nfs_client_v2;
+    Data_Get_Struct(self, sigar_nfs_client_v2_t, nfs_client_v2);
+    return rb_ll2inum(nfs_client_v2->getattr);    
+}
+static VALUE rb_sigar_NfsClientV2_setattr(VALUE self)
+{
+    sigar_nfs_client_v2_t *nfs_client_v2;
+    Data_Get_Struct(self, sigar_nfs_client_v2_t, nfs_client_v2);
+    return rb_ll2inum(nfs_client_v2->setattr);    
+}
+static VALUE rb_sigar_NfsClientV2_root(VALUE self)
+{
+    sigar_nfs_client_v2_t *nfs_client_v2;
+    Data_Get_Struct(self, sigar_nfs_client_v2_t, nfs_client_v2);
+    return rb_ll2inum(nfs_client_v2->root);    
+}
+static VALUE rb_sigar_NfsClientV2_lookup(VALUE self)
+{
+    sigar_nfs_client_v2_t *nfs_client_v2;
+    Data_Get_Struct(self, sigar_nfs_client_v2_t, nfs_client_v2);
+    return rb_ll2inum(nfs_client_v2->lookup);    
+}
+static VALUE rb_sigar_NfsClientV2_readlink(VALUE self)
+{
+    sigar_nfs_client_v2_t *nfs_client_v2;
+    Data_Get_Struct(self, sigar_nfs_client_v2_t, nfs_client_v2);
+    return rb_ll2inum(nfs_client_v2->readlink);    
+}
+static VALUE rb_sigar_NfsClientV2_read(VALUE self)
+{
+    sigar_nfs_client_v2_t *nfs_client_v2;
+    Data_Get_Struct(self, sigar_nfs_client_v2_t, nfs_client_v2);
+    return rb_ll2inum(nfs_client_v2->read);    
+}
+static VALUE rb_sigar_NfsClientV2_writecache(VALUE self)
+{
+    sigar_nfs_client_v2_t *nfs_client_v2;
+    Data_Get_Struct(self, sigar_nfs_client_v2_t, nfs_client_v2);
+    return rb_ll2inum(nfs_client_v2->writecache);    
+}
+static VALUE rb_sigar_NfsClientV2_write(VALUE self)
+{
+    sigar_nfs_client_v2_t *nfs_client_v2;
+    Data_Get_Struct(self, sigar_nfs_client_v2_t, nfs_client_v2);
+    return rb_ll2inum(nfs_client_v2->write);    
+}
+static VALUE rb_sigar_NfsClientV2_create(VALUE self)
+{
+    sigar_nfs_client_v2_t *nfs_client_v2;
+    Data_Get_Struct(self, sigar_nfs_client_v2_t, nfs_client_v2);
+    return rb_ll2inum(nfs_client_v2->create);    
+}
+static VALUE rb_sigar_NfsClientV2_remove(VALUE self)
+{
+    sigar_nfs_client_v2_t *nfs_client_v2;
+    Data_Get_Struct(self, sigar_nfs_client_v2_t, nfs_client_v2);
+    return rb_ll2inum(nfs_client_v2->remove);    
+}
+static VALUE rb_sigar_NfsClientV2_rename(VALUE self)
+{
+    sigar_nfs_client_v2_t *nfs_client_v2;
+    Data_Get_Struct(self, sigar_nfs_client_v2_t, nfs_client_v2);
+    return rb_ll2inum(nfs_client_v2->rename);    
+}
+static VALUE rb_sigar_NfsClientV2_link(VALUE self)
+{
+    sigar_nfs_client_v2_t *nfs_client_v2;
+    Data_Get_Struct(self, sigar_nfs_client_v2_t, nfs_client_v2);
+    return rb_ll2inum(nfs_client_v2->link);    
+}
+static VALUE rb_sigar_NfsClientV2_symlink(VALUE self)
+{
+    sigar_nfs_client_v2_t *nfs_client_v2;
+    Data_Get_Struct(self, sigar_nfs_client_v2_t, nfs_client_v2);
+    return rb_ll2inum(nfs_client_v2->symlink);    
+}
+static VALUE rb_sigar_NfsClientV2_mkdir(VALUE self)
+{
+    sigar_nfs_client_v2_t *nfs_client_v2;
+    Data_Get_Struct(self, sigar_nfs_client_v2_t, nfs_client_v2);
+    return rb_ll2inum(nfs_client_v2->mkdir);    
+}
+static VALUE rb_sigar_NfsClientV2_rmdir(VALUE self)
+{
+    sigar_nfs_client_v2_t *nfs_client_v2;
+    Data_Get_Struct(self, sigar_nfs_client_v2_t, nfs_client_v2);
+    return rb_ll2inum(nfs_client_v2->rmdir);    
+}
+static VALUE rb_sigar_NfsClientV2_readdir(VALUE self)
+{
+    sigar_nfs_client_v2_t *nfs_client_v2;
+    Data_Get_Struct(self, sigar_nfs_client_v2_t, nfs_client_v2);
+    return rb_ll2inum(nfs_client_v2->readdir);    
+}
+static VALUE rb_sigar_NfsClientV2_fsstat(VALUE self)
+{
+    sigar_nfs_client_v2_t *nfs_client_v2;
+    Data_Get_Struct(self, sigar_nfs_client_v2_t, nfs_client_v2);
+    return rb_ll2inum(nfs_client_v2->fsstat);    
+}
+static VALUE rb_cSigarFileAttrs;
+
+static VALUE rb_sigar_file_attrs(VALUE obj, VALUE name)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_file_attrs_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_file_attrs_get(sigar, StringValuePtr(name), RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarFileAttrs, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_FileAttrs_permissions(VALUE self)
+{
+    sigar_file_attrs_t *file_attrs;
+    Data_Get_Struct(self, sigar_file_attrs_t, file_attrs);
+    return rb_ll2inum(file_attrs->permissions);    
+}
+static VALUE rb_sigar_FileAttrs_type(VALUE self)
+{
+    sigar_file_attrs_t *file_attrs;
+    Data_Get_Struct(self, sigar_file_attrs_t, file_attrs);
+    return rb_int2inum(file_attrs->type);    
+}
+static VALUE rb_sigar_FileAttrs_uid(VALUE self)
+{
+    sigar_file_attrs_t *file_attrs;
+    Data_Get_Struct(self, sigar_file_attrs_t, file_attrs);
+    return rb_ll2inum(file_attrs->uid);    
+}
+static VALUE rb_sigar_FileAttrs_gid(VALUE self)
+{
+    sigar_file_attrs_t *file_attrs;
+    Data_Get_Struct(self, sigar_file_attrs_t, file_attrs);
+    return rb_ll2inum(file_attrs->gid);    
+}
+static VALUE rb_sigar_FileAttrs_inode(VALUE self)
+{
+    sigar_file_attrs_t *file_attrs;
+    Data_Get_Struct(self, sigar_file_attrs_t, file_attrs);
+    return rb_ll2inum(file_attrs->inode);    
+}
+static VALUE rb_sigar_FileAttrs_device(VALUE self)
+{
+    sigar_file_attrs_t *file_attrs;
+    Data_Get_Struct(self, sigar_file_attrs_t, file_attrs);
+    return rb_ll2inum(file_attrs->device);    
+}
+static VALUE rb_sigar_FileAttrs_nlink(VALUE self)
+{
+    sigar_file_attrs_t *file_attrs;
+    Data_Get_Struct(self, sigar_file_attrs_t, file_attrs);
+    return rb_ll2inum(file_attrs->nlink);    
+}
+static VALUE rb_sigar_FileAttrs_size(VALUE self)
+{
+    sigar_file_attrs_t *file_attrs;
+    Data_Get_Struct(self, sigar_file_attrs_t, file_attrs);
+    return rb_ll2inum(file_attrs->size);    
+}
+static VALUE rb_sigar_FileAttrs_atime(VALUE self)
+{
+    sigar_file_attrs_t *file_attrs;
+    Data_Get_Struct(self, sigar_file_attrs_t, file_attrs);
+    return rb_ll2inum(file_attrs->atime);    
+}
+static VALUE rb_sigar_FileAttrs_ctime(VALUE self)
+{
+    sigar_file_attrs_t *file_attrs;
+    Data_Get_Struct(self, sigar_file_attrs_t, file_attrs);
+    return rb_ll2inum(file_attrs->ctime);    
+}
+static VALUE rb_sigar_FileAttrs_mtime(VALUE self)
+{
+    sigar_file_attrs_t *file_attrs;
+    Data_Get_Struct(self, sigar_file_attrs_t, file_attrs);
+    return rb_ll2inum(file_attrs->mtime);    
+}
+static VALUE rb_cSigarProcCred;
+
+static VALUE rb_sigar_proc_cred(VALUE obj, VALUE pid)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_proc_cred_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_proc_cred_get(sigar, OBJ2PID(pid), RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarProcCred, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_ProcCred_uid(VALUE self)
+{
+    sigar_proc_cred_t *proc_cred;
+    Data_Get_Struct(self, sigar_proc_cred_t, proc_cred);
+    return rb_ll2inum(proc_cred->uid);    
+}
+static VALUE rb_sigar_ProcCred_gid(VALUE self)
+{
+    sigar_proc_cred_t *proc_cred;
+    Data_Get_Struct(self, sigar_proc_cred_t, proc_cred);
+    return rb_ll2inum(proc_cred->gid);    
+}
+static VALUE rb_sigar_ProcCred_euid(VALUE self)
+{
+    sigar_proc_cred_t *proc_cred;
+    Data_Get_Struct(self, sigar_proc_cred_t, proc_cred);
+    return rb_ll2inum(proc_cred->euid);    
+}
+static VALUE rb_sigar_ProcCred_egid(VALUE self)
+{
+    sigar_proc_cred_t *proc_cred;
+    Data_Get_Struct(self, sigar_proc_cred_t, proc_cred);
+    return rb_ll2inum(proc_cred->egid);    
+}
+static VALUE rb_cSigarDirUsage;
+
+static VALUE rb_sigar_dir_usage(VALUE obj, VALUE name)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_dir_usage_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_dir_usage_get(sigar, StringValuePtr(name), RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarDirUsage, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_DirUsage_total(VALUE self)
+{
+    sigar_dir_usage_t *dir_usage;
+    Data_Get_Struct(self, sigar_dir_usage_t, dir_usage);
+    return rb_ll2inum(dir_usage->total);    
+}
+static VALUE rb_sigar_DirUsage_files(VALUE self)
+{
+    sigar_dir_usage_t *dir_usage;
+    Data_Get_Struct(self, sigar_dir_usage_t, dir_usage);
+    return rb_ll2inum(dir_usage->files);    
+}
+static VALUE rb_sigar_DirUsage_subdirs(VALUE self)
+{
+    sigar_dir_usage_t *dir_usage;
+    Data_Get_Struct(self, sigar_dir_usage_t, dir_usage);
+    return rb_ll2inum(dir_usage->subdirs);    
+}
+static VALUE rb_sigar_DirUsage_symlinks(VALUE self)
+{
+    sigar_dir_usage_t *dir_usage;
+    Data_Get_Struct(self, sigar_dir_usage_t, dir_usage);
+    return rb_ll2inum(dir_usage->symlinks);    
+}
+static VALUE rb_sigar_DirUsage_chrdevs(VALUE self)
+{
+    sigar_dir_usage_t *dir_usage;
+    Data_Get_Struct(self, sigar_dir_usage_t, dir_usage);
+    return rb_ll2inum(dir_usage->chrdevs);    
+}
+static VALUE rb_sigar_DirUsage_blkdevs(VALUE self)
+{
+    sigar_dir_usage_t *dir_usage;
+    Data_Get_Struct(self, sigar_dir_usage_t, dir_usage);
+    return rb_ll2inum(dir_usage->blkdevs);    
+}
+static VALUE rb_sigar_DirUsage_sockets(VALUE self)
+{
+    sigar_dir_usage_t *dir_usage;
+    Data_Get_Struct(self, sigar_dir_usage_t, dir_usage);
+    return rb_ll2inum(dir_usage->sockets);    
+}
+static VALUE rb_sigar_DirUsage_disk_usage(VALUE self)
+{
+    sigar_dir_usage_t *dir_usage;
+    Data_Get_Struct(self, sigar_dir_usage_t, dir_usage);
+    return rb_ll2inum(dir_usage->disk_usage);    
+}
+static VALUE rb_cSigarNfsServerV3;
+
+static VALUE rb_sigar_nfs_server_v3(VALUE obj)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_nfs_server_v3_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_nfs_server_v3_get(sigar, RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarNfsServerV3, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_NfsServerV3_null(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->null);    
+}
+static VALUE rb_sigar_NfsServerV3_getattr(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->getattr);    
+}
+static VALUE rb_sigar_NfsServerV3_setattr(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->setattr);    
+}
+static VALUE rb_sigar_NfsServerV3_lookup(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->lookup);    
+}
+static VALUE rb_sigar_NfsServerV3_access(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->access);    
+}
+static VALUE rb_sigar_NfsServerV3_readlink(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->readlink);    
+}
+static VALUE rb_sigar_NfsServerV3_read(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->read);    
+}
+static VALUE rb_sigar_NfsServerV3_write(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->write);    
+}
+static VALUE rb_sigar_NfsServerV3_create(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->create);    
+}
+static VALUE rb_sigar_NfsServerV3_mkdir(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->mkdir);    
+}
+static VALUE rb_sigar_NfsServerV3_symlink(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->symlink);    
+}
+static VALUE rb_sigar_NfsServerV3_mknod(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->mknod);    
+}
+static VALUE rb_sigar_NfsServerV3_remove(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->remove);    
+}
+static VALUE rb_sigar_NfsServerV3_rmdir(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->rmdir);    
+}
+static VALUE rb_sigar_NfsServerV3_rename(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->rename);    
+}
+static VALUE rb_sigar_NfsServerV3_link(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->link);    
+}
+static VALUE rb_sigar_NfsServerV3_readdir(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->readdir);    
+}
+static VALUE rb_sigar_NfsServerV3_readdirplus(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->readdirplus);    
+}
+static VALUE rb_sigar_NfsServerV3_fsstat(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->fsstat);    
+}
+static VALUE rb_sigar_NfsServerV3_fsinfo(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->fsinfo);    
+}
+static VALUE rb_sigar_NfsServerV3_pathconf(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->pathconf);    
+}
+static VALUE rb_sigar_NfsServerV3_commit(VALUE self)
+{
+    sigar_nfs_server_v3_t *nfs_server_v3;
+    Data_Get_Struct(self, sigar_nfs_server_v3_t, nfs_server_v3);
+    return rb_ll2inum(nfs_server_v3->commit);    
+}
+static VALUE rb_cSigarDirStat;
+
+static VALUE rb_sigar_dir_stat(VALUE obj, VALUE name)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_dir_stat_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_dir_stat_get(sigar, StringValuePtr(name), RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarDirStat, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_DirStat_total(VALUE self)
+{
+    sigar_dir_stat_t *dir_stat;
+    Data_Get_Struct(self, sigar_dir_stat_t, dir_stat);
+    return rb_ll2inum(dir_stat->total);    
+}
+static VALUE rb_sigar_DirStat_files(VALUE self)
+{
+    sigar_dir_stat_t *dir_stat;
+    Data_Get_Struct(self, sigar_dir_stat_t, dir_stat);
+    return rb_ll2inum(dir_stat->files);    
+}
+static VALUE rb_sigar_DirStat_subdirs(VALUE self)
+{
+    sigar_dir_stat_t *dir_stat;
+    Data_Get_Struct(self, sigar_dir_stat_t, dir_stat);
+    return rb_ll2inum(dir_stat->subdirs);    
+}
+static VALUE rb_sigar_DirStat_symlinks(VALUE self)
+{
+    sigar_dir_stat_t *dir_stat;
+    Data_Get_Struct(self, sigar_dir_stat_t, dir_stat);
+    return rb_ll2inum(dir_stat->symlinks);    
+}
+static VALUE rb_sigar_DirStat_chrdevs(VALUE self)
+{
+    sigar_dir_stat_t *dir_stat;
+    Data_Get_Struct(self, sigar_dir_stat_t, dir_stat);
+    return rb_ll2inum(dir_stat->chrdevs);    
+}
+static VALUE rb_sigar_DirStat_blkdevs(VALUE self)
+{
+    sigar_dir_stat_t *dir_stat;
+    Data_Get_Struct(self, sigar_dir_stat_t, dir_stat);
+    return rb_ll2inum(dir_stat->blkdevs);    
+}
+static VALUE rb_sigar_DirStat_sockets(VALUE self)
+{
+    sigar_dir_stat_t *dir_stat;
+    Data_Get_Struct(self, sigar_dir_stat_t, dir_stat);
+    return rb_ll2inum(dir_stat->sockets);    
+}
+static VALUE rb_sigar_DirStat_disk_usage(VALUE self)
+{
+    sigar_dir_stat_t *dir_stat;
+    Data_Get_Struct(self, sigar_dir_stat_t, dir_stat);
+    return rb_ll2inum(dir_stat->disk_usage);    
+}
+static VALUE rb_cSigarTcp;
+
+static VALUE rb_sigar_tcp(VALUE obj)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_tcp_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_tcp_get(sigar, RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarTcp, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_Tcp_active_opens(VALUE self)
+{
+    sigar_tcp_t *tcp;
+    Data_Get_Struct(self, sigar_tcp_t, tcp);
+    return rb_ll2inum(tcp->active_opens);    
+}
+static VALUE rb_sigar_Tcp_passive_opens(VALUE self)
+{
+    sigar_tcp_t *tcp;
+    Data_Get_Struct(self, sigar_tcp_t, tcp);
+    return rb_ll2inum(tcp->passive_opens);    
+}
+static VALUE rb_sigar_Tcp_attempt_fails(VALUE self)
+{
+    sigar_tcp_t *tcp;
+    Data_Get_Struct(self, sigar_tcp_t, tcp);
+    return rb_ll2inum(tcp->attempt_fails);    
+}
+static VALUE rb_sigar_Tcp_estab_resets(VALUE self)
+{
+    sigar_tcp_t *tcp;
+    Data_Get_Struct(self, sigar_tcp_t, tcp);
+    return rb_ll2inum(tcp->estab_resets);    
+}
+static VALUE rb_sigar_Tcp_curr_estab(VALUE self)
+{
+    sigar_tcp_t *tcp;
+    Data_Get_Struct(self, sigar_tcp_t, tcp);
+    return rb_ll2inum(tcp->curr_estab);    
+}
+static VALUE rb_sigar_Tcp_in_segs(VALUE self)
+{
+    sigar_tcp_t *tcp;
+    Data_Get_Struct(self, sigar_tcp_t, tcp);
+    return rb_ll2inum(tcp->in_segs);    
+}
+static VALUE rb_sigar_Tcp_out_segs(VALUE self)
+{
+    sigar_tcp_t *tcp;
+    Data_Get_Struct(self, sigar_tcp_t, tcp);
+    return rb_ll2inum(tcp->out_segs);    
+}
+static VALUE rb_sigar_Tcp_retrans_segs(VALUE self)
+{
+    sigar_tcp_t *tcp;
+    Data_Get_Struct(self, sigar_tcp_t, tcp);
+    return rb_ll2inum(tcp->retrans_segs);    
+}
+static VALUE rb_sigar_Tcp_in_errs(VALUE self)
+{
+    sigar_tcp_t *tcp;
+    Data_Get_Struct(self, sigar_tcp_t, tcp);
+    return rb_ll2inum(tcp->in_errs);    
+}
+static VALUE rb_sigar_Tcp_out_rsts(VALUE self)
+{
+    sigar_tcp_t *tcp;
+    Data_Get_Struct(self, sigar_tcp_t, tcp);
+    return rb_ll2inum(tcp->out_rsts);    
+}
+static VALUE rb_sigar_CpuInfo_vendor(VALUE self)
+{
+    sigar_cpu_info_t *cpu_info;
+    Data_Get_Struct(self, sigar_cpu_info_t, cpu_info);
+    return rb_str_new2(cpu_info->vendor);    
+}
+static VALUE rb_sigar_CpuInfo_model(VALUE self)
+{
+    sigar_cpu_info_t *cpu_info;
+    Data_Get_Struct(self, sigar_cpu_info_t, cpu_info);
+    return rb_str_new2(cpu_info->model);    
+}
+static VALUE rb_sigar_CpuInfo_mhz(VALUE self)
+{
+    sigar_cpu_info_t *cpu_info;
+    Data_Get_Struct(self, sigar_cpu_info_t, cpu_info);
+    return rb_int2inum(cpu_info->mhz);    
+}
+static VALUE rb_sigar_CpuInfo_mhz_max(VALUE self)
+{
+    sigar_cpu_info_t *cpu_info;
+    Data_Get_Struct(self, sigar_cpu_info_t, cpu_info);
+    return rb_int2inum(cpu_info->mhz_max);    
+}
+static VALUE rb_sigar_CpuInfo_mhz_min(VALUE self)
+{
+    sigar_cpu_info_t *cpu_info;
+    Data_Get_Struct(self, sigar_cpu_info_t, cpu_info);
+    return rb_int2inum(cpu_info->mhz_min);    
+}
+static VALUE rb_sigar_CpuInfo_cache_size(VALUE self)
+{
+    sigar_cpu_info_t *cpu_info;
+    Data_Get_Struct(self, sigar_cpu_info_t, cpu_info);
+    return rb_ll2inum(cpu_info->cache_size);    
+}
+static VALUE rb_sigar_CpuInfo_total_cores(VALUE self)
+{
+    sigar_cpu_info_t *cpu_info;
+    Data_Get_Struct(self, sigar_cpu_info_t, cpu_info);
+    return rb_int2inum(cpu_info->total_cores);    
+}
+static VALUE rb_sigar_CpuInfo_total_sockets(VALUE self)
+{
+    sigar_cpu_info_t *cpu_info;
+    Data_Get_Struct(self, sigar_cpu_info_t, cpu_info);
+    return rb_int2inum(cpu_info->total_sockets);    
+}
+static VALUE rb_sigar_CpuInfo_cores_per_socket(VALUE self)
+{
+    sigar_cpu_info_t *cpu_info;
+    Data_Get_Struct(self, sigar_cpu_info_t, cpu_info);
+    return rb_int2inum(cpu_info->cores_per_socket);    
+}
+static VALUE rb_cSigarProcCumulativeDiskIO;
+
+static VALUE rb_sigar_proc_cumulative_disk_io(VALUE obj, VALUE pid)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_proc_cumulative_disk_io_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_proc_cumulative_disk_io_get(sigar, OBJ2PID(pid), RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarProcCumulativeDiskIO, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_ProcCumulativeDiskIO_bytes_read(VALUE self)
+{
+    sigar_proc_cumulative_disk_io_t *proc_cumulative_disk_io;
+    Data_Get_Struct(self, sigar_proc_cumulative_disk_io_t, proc_cumulative_disk_io);
+    return rb_ll2inum(proc_cumulative_disk_io->bytes_read);    
+}
+static VALUE rb_sigar_ProcCumulativeDiskIO_bytes_written(VALUE self)
+{
+    sigar_proc_cumulative_disk_io_t *proc_cumulative_disk_io;
+    Data_Get_Struct(self, sigar_proc_cumulative_disk_io_t, proc_cumulative_disk_io);
+    return rb_ll2inum(proc_cumulative_disk_io->bytes_written);    
+}
+static VALUE rb_sigar_ProcCumulativeDiskIO_bytes_total(VALUE self)
+{
+    sigar_proc_cumulative_disk_io_t *proc_cumulative_disk_io;
+    Data_Get_Struct(self, sigar_proc_cumulative_disk_io_t, proc_cumulative_disk_io);
+    return rb_ll2inum(proc_cumulative_disk_io->bytes_total);    
+}
+static VALUE rb_sigar_NetConnection_local_port(VALUE self)
+{
+    sigar_net_connection_t *net_connection;
+    Data_Get_Struct(self, sigar_net_connection_t, net_connection);
+    return rb_ll2inum(net_connection->local_port);    
+}
+static VALUE rb_sigar_NetConnection_local_address(VALUE self)
+{
+    sigar_net_connection_t *net_connection;
+    Data_Get_Struct(self, sigar_net_connection_t, net_connection);
+    return rb_sigar_net_address_to_s(net_connection->local_address);    
+}
+static VALUE rb_sigar_NetConnection_remote_port(VALUE self)
+{
+    sigar_net_connection_t *net_connection;
+    Data_Get_Struct(self, sigar_net_connection_t, net_connection);
+    return rb_ll2inum(net_connection->remote_port);    
+}
+static VALUE rb_sigar_NetConnection_remote_address(VALUE self)
+{
+    sigar_net_connection_t *net_connection;
+    Data_Get_Struct(self, sigar_net_connection_t, net_connection);
+    return rb_sigar_net_address_to_s(net_connection->remote_address);    
+}
+static VALUE rb_sigar_NetConnection_type(VALUE self)
+{
+    sigar_net_connection_t *net_connection;
+    Data_Get_Struct(self, sigar_net_connection_t, net_connection);
+    return rb_int2inum(net_connection->type);    
+}
+static VALUE rb_sigar_NetConnection_state(VALUE self)
+{
+    sigar_net_connection_t *net_connection;
+    Data_Get_Struct(self, sigar_net_connection_t, net_connection);
+    return rb_int2inum(net_connection->state);    
+}
+static VALUE rb_sigar_NetConnection_send_queue(VALUE self)
+{
+    sigar_net_connection_t *net_connection;
+    Data_Get_Struct(self, sigar_net_connection_t, net_connection);
+    return rb_ll2inum(net_connection->send_queue);    
+}
+static VALUE rb_sigar_NetConnection_receive_queue(VALUE self)
+{
+    sigar_net_connection_t *net_connection;
+    Data_Get_Struct(self, sigar_net_connection_t, net_connection);
+    return rb_ll2inum(net_connection->receive_queue);    
+}
+static VALUE rb_sigar_NetRoute_destination(VALUE self)
+{
+    sigar_net_route_t *net_route;
+    Data_Get_Struct(self, sigar_net_route_t, net_route);
+    return rb_sigar_net_address_to_s(net_route->destination);    
+}
+static VALUE rb_sigar_NetRoute_gateway(VALUE self)
+{
+    sigar_net_route_t *net_route;
+    Data_Get_Struct(self, sigar_net_route_t, net_route);
+    return rb_sigar_net_address_to_s(net_route->gateway);    
+}
+static VALUE rb_sigar_NetRoute_flags(VALUE self)
+{
+    sigar_net_route_t *net_route;
+    Data_Get_Struct(self, sigar_net_route_t, net_route);
+    return rb_ll2inum(net_route->flags);    
+}
+static VALUE rb_sigar_NetRoute_refcnt(VALUE self)
+{
+    sigar_net_route_t *net_route;
+    Data_Get_Struct(self, sigar_net_route_t, net_route);
+    return rb_ll2inum(net_route->refcnt);    
+}
+static VALUE rb_sigar_NetRoute_use(VALUE self)
+{
+    sigar_net_route_t *net_route;
+    Data_Get_Struct(self, sigar_net_route_t, net_route);
+    return rb_ll2inum(net_route->use);    
+}
+static VALUE rb_sigar_NetRoute_metric(VALUE self)
+{
+    sigar_net_route_t *net_route;
+    Data_Get_Struct(self, sigar_net_route_t, net_route);
+    return rb_ll2inum(net_route->metric);    
+}
+static VALUE rb_sigar_NetRoute_mask(VALUE self)
+{
+    sigar_net_route_t *net_route;
+    Data_Get_Struct(self, sigar_net_route_t, net_route);
+    return rb_sigar_net_address_to_s(net_route->mask);    
+}
+static VALUE rb_sigar_NetRoute_mtu(VALUE self)
+{
+    sigar_net_route_t *net_route;
+    Data_Get_Struct(self, sigar_net_route_t, net_route);
+    return rb_ll2inum(net_route->mtu);    
+}
+static VALUE rb_sigar_NetRoute_window(VALUE self)
+{
+    sigar_net_route_t *net_route;
+    Data_Get_Struct(self, sigar_net_route_t, net_route);
+    return rb_ll2inum(net_route->window);    
+}
+static VALUE rb_sigar_NetRoute_irtt(VALUE self)
+{
+    sigar_net_route_t *net_route;
+    Data_Get_Struct(self, sigar_net_route_t, net_route);
+    return rb_ll2inum(net_route->irtt);    
+}
+static VALUE rb_sigar_NetRoute_ifname(VALUE self)
+{
+    sigar_net_route_t *net_route;
+    Data_Get_Struct(self, sigar_net_route_t, net_route);
+    return rb_str_new2(net_route->ifname);    
+}
+static VALUE rb_cSigarCpu;
+
+static VALUE rb_sigar_cpu(VALUE obj)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_cpu_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_cpu_get(sigar, RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarCpu, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_Cpu_user(VALUE self)
+{
+    sigar_cpu_t *cpu;
+    Data_Get_Struct(self, sigar_cpu_t, cpu);
+    return rb_ll2inum(cpu->user);    
+}
+static VALUE rb_sigar_Cpu_sys(VALUE self)
+{
+    sigar_cpu_t *cpu;
+    Data_Get_Struct(self, sigar_cpu_t, cpu);
+    return rb_ll2inum(cpu->sys);    
+}
+static VALUE rb_sigar_Cpu_nice(VALUE self)
+{
+    sigar_cpu_t *cpu;
+    Data_Get_Struct(self, sigar_cpu_t, cpu);
+    return rb_ll2inum(cpu->nice);    
+}
+static VALUE rb_sigar_Cpu_idle(VALUE self)
+{
+    sigar_cpu_t *cpu;
+    Data_Get_Struct(self, sigar_cpu_t, cpu);
+    return rb_ll2inum(cpu->idle);    
+}
+static VALUE rb_sigar_Cpu_wait(VALUE self)
+{
+    sigar_cpu_t *cpu;
+    Data_Get_Struct(self, sigar_cpu_t, cpu);
+    return rb_ll2inum(cpu->wait);    
+}
+static VALUE rb_sigar_Cpu_irq(VALUE self)
+{
+    sigar_cpu_t *cpu;
+    Data_Get_Struct(self, sigar_cpu_t, cpu);
+    return rb_ll2inum(cpu->irq);    
+}
+static VALUE rb_sigar_Cpu_soft_irq(VALUE self)
+{
+    sigar_cpu_t *cpu;
+    Data_Get_Struct(self, sigar_cpu_t, cpu);
+    return rb_ll2inum(cpu->soft_irq);    
+}
+static VALUE rb_sigar_Cpu_stolen(VALUE self)
+{
+    sigar_cpu_t *cpu;
+    Data_Get_Struct(self, sigar_cpu_t, cpu);
+    return rb_ll2inum(cpu->stolen);    
+}
+static VALUE rb_sigar_Cpu_total(VALUE self)
+{
+    sigar_cpu_t *cpu;
+    Data_Get_Struct(self, sigar_cpu_t, cpu);
+    return rb_ll2inum(cpu->total);    
+}
+static VALUE rb_cSigarProcCpu;
+
+static VALUE rb_sigar_proc_cpu(VALUE obj, VALUE pid)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_proc_cpu_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_proc_cpu_get(sigar, OBJ2PID(pid), RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarProcCpu, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_ProcCpu_percent(VALUE self)
+{
+    sigar_proc_cpu_t *proc_cpu;
+    Data_Get_Struct(self, sigar_proc_cpu_t, proc_cpu);
+    return rb_float_new(proc_cpu->percent);    
+}
+static VALUE rb_sigar_ProcCpu_last_time(VALUE self)
+{
+    sigar_proc_cpu_t *proc_cpu;
+    Data_Get_Struct(self, sigar_proc_cpu_t, proc_cpu);
+    return rb_ll2inum(proc_cpu->last_time);    
+}
+static VALUE rb_sigar_ProcCpu_start_time(VALUE self)
+{
+    sigar_proc_cpu_t *proc_cpu;
+    Data_Get_Struct(self, sigar_proc_cpu_t, proc_cpu);
+    return rb_ll2inum(proc_cpu->start_time);    
+}
+static VALUE rb_sigar_ProcCpu_user(VALUE self)
+{
+    sigar_proc_cpu_t *proc_cpu;
+    Data_Get_Struct(self, sigar_proc_cpu_t, proc_cpu);
+    return rb_ll2inum(proc_cpu->user);    
+}
+static VALUE rb_sigar_ProcCpu_sys(VALUE self)
+{
+    sigar_proc_cpu_t *proc_cpu;
+    Data_Get_Struct(self, sigar_proc_cpu_t, proc_cpu);
+    return rb_ll2inum(proc_cpu->sys);    
+}
+static VALUE rb_sigar_ProcCpu_total(VALUE self)
+{
+    sigar_proc_cpu_t *proc_cpu;
+    Data_Get_Struct(self, sigar_proc_cpu_t, proc_cpu);
+    return rb_ll2inum(proc_cpu->total);    
+}
+static VALUE rb_sigar_CpuPerc_user(VALUE self)
+{
+    sigar_cpu_perc_t *cpu_perc;
+    Data_Get_Struct(self, sigar_cpu_perc_t, cpu_perc);
+    return rb_float_new(cpu_perc->user);    
+}
+static VALUE rb_sigar_CpuPerc_sys(VALUE self)
+{
+    sigar_cpu_perc_t *cpu_perc;
+    Data_Get_Struct(self, sigar_cpu_perc_t, cpu_perc);
+    return rb_float_new(cpu_perc->sys);    
+}
+static VALUE rb_sigar_CpuPerc_nice(VALUE self)
+{
+    sigar_cpu_perc_t *cpu_perc;
+    Data_Get_Struct(self, sigar_cpu_perc_t, cpu_perc);
+    return rb_float_new(cpu_perc->nice);    
+}
+static VALUE rb_sigar_CpuPerc_idle(VALUE self)
+{
+    sigar_cpu_perc_t *cpu_perc;
+    Data_Get_Struct(self, sigar_cpu_perc_t, cpu_perc);
+    return rb_float_new(cpu_perc->idle);    
+}
+static VALUE rb_sigar_CpuPerc_wait(VALUE self)
+{
+    sigar_cpu_perc_t *cpu_perc;
+    Data_Get_Struct(self, sigar_cpu_perc_t, cpu_perc);
+    return rb_float_new(cpu_perc->wait);    
+}
+static VALUE rb_sigar_CpuPerc_irq(VALUE self)
+{
+    sigar_cpu_perc_t *cpu_perc;
+    Data_Get_Struct(self, sigar_cpu_perc_t, cpu_perc);
+    return rb_float_new(cpu_perc->irq);    
+}
+static VALUE rb_sigar_CpuPerc_soft_irq(VALUE self)
+{
+    sigar_cpu_perc_t *cpu_perc;
+    Data_Get_Struct(self, sigar_cpu_perc_t, cpu_perc);
+    return rb_float_new(cpu_perc->soft_irq);    
+}
+static VALUE rb_sigar_CpuPerc_stolen(VALUE self)
+{
+    sigar_cpu_perc_t *cpu_perc;
+    Data_Get_Struct(self, sigar_cpu_perc_t, cpu_perc);
+    return rb_float_new(cpu_perc->stolen);    
+}
+static VALUE rb_sigar_CpuPerc_combined(VALUE self)
+{
+    sigar_cpu_perc_t *cpu_perc;
+    Data_Get_Struct(self, sigar_cpu_perc_t, cpu_perc);
+    return rb_float_new(cpu_perc->combined);    
+}
+static VALUE rb_cSigarMem;
+
+static VALUE rb_sigar_mem(VALUE obj)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_mem_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_mem_get(sigar, RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarMem, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_Mem_total(VALUE self)
+{
+    sigar_mem_t *mem;
+    Data_Get_Struct(self, sigar_mem_t, mem);
+    return rb_ll2inum(mem->total);    
+}
+static VALUE rb_sigar_Mem_ram(VALUE self)
+{
+    sigar_mem_t *mem;
+    Data_Get_Struct(self, sigar_mem_t, mem);
+    return rb_ll2inum(mem->ram);    
+}
+static VALUE rb_sigar_Mem_used(VALUE self)
+{
+    sigar_mem_t *mem;
+    Data_Get_Struct(self, sigar_mem_t, mem);
+    return rb_ll2inum(mem->used);    
+}
+static VALUE rb_sigar_Mem_free(VALUE self)
+{
+    sigar_mem_t *mem;
+    Data_Get_Struct(self, sigar_mem_t, mem);
+    return rb_ll2inum(mem->free);    
+}
+static VALUE rb_sigar_Mem_actual_used(VALUE self)
+{
+    sigar_mem_t *mem;
+    Data_Get_Struct(self, sigar_mem_t, mem);
+    return rb_ll2inum(mem->actual_used);    
+}
+static VALUE rb_sigar_Mem_actual_free(VALUE self)
+{
+    sigar_mem_t *mem;
+    Data_Get_Struct(self, sigar_mem_t, mem);
+    return rb_ll2inum(mem->actual_free);    
+}
+static VALUE rb_sigar_Mem_used_percent(VALUE self)
+{
+    sigar_mem_t *mem;
+    Data_Get_Struct(self, sigar_mem_t, mem);
+    return rb_float_new(mem->used_percent);    
+}
+static VALUE rb_sigar_Mem_free_percent(VALUE self)
+{
+    sigar_mem_t *mem;
+    Data_Get_Struct(self, sigar_mem_t, mem);
+    return rb_float_new(mem->free_percent);    
+}
+static VALUE rb_cSigarNetInterfaceStat;
+
+static VALUE rb_sigar_net_interface_stat(VALUE obj, VALUE name)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_net_interface_stat_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_net_interface_stat_get(sigar, StringValuePtr(name), RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarNetInterfaceStat, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_NetInterfaceStat_rx_bytes(VALUE self)
+{
+    sigar_net_interface_stat_t *net_interface_stat;
+    Data_Get_Struct(self, sigar_net_interface_stat_t, net_interface_stat);
+    return rb_ll2inum(net_interface_stat->rx_bytes);    
+}
+static VALUE rb_sigar_NetInterfaceStat_rx_packets(VALUE self)
+{
+    sigar_net_interface_stat_t *net_interface_stat;
+    Data_Get_Struct(self, sigar_net_interface_stat_t, net_interface_stat);
+    return rb_ll2inum(net_interface_stat->rx_packets);    
+}
+static VALUE rb_sigar_NetInterfaceStat_rx_errors(VALUE self)
+{
+    sigar_net_interface_stat_t *net_interface_stat;
+    Data_Get_Struct(self, sigar_net_interface_stat_t, net_interface_stat);
+    return rb_ll2inum(net_interface_stat->rx_errors);    
+}
+static VALUE rb_sigar_NetInterfaceStat_rx_dropped(VALUE self)
+{
+    sigar_net_interface_stat_t *net_interface_stat;
+    Data_Get_Struct(self, sigar_net_interface_stat_t, net_interface_stat);
+    return rb_ll2inum(net_interface_stat->rx_dropped);    
+}
+static VALUE rb_sigar_NetInterfaceStat_rx_overruns(VALUE self)
+{
+    sigar_net_interface_stat_t *net_interface_stat;
+    Data_Get_Struct(self, sigar_net_interface_stat_t, net_interface_stat);
+    return rb_ll2inum(net_interface_stat->rx_overruns);    
+}
+static VALUE rb_sigar_NetInterfaceStat_rx_frame(VALUE self)
+{
+    sigar_net_interface_stat_t *net_interface_stat;
+    Data_Get_Struct(self, sigar_net_interface_stat_t, net_interface_stat);
+    return rb_ll2inum(net_interface_stat->rx_frame);    
+}
+static VALUE rb_sigar_NetInterfaceStat_tx_bytes(VALUE self)
+{
+    sigar_net_interface_stat_t *net_interface_stat;
+    Data_Get_Struct(self, sigar_net_interface_stat_t, net_interface_stat);
+    return rb_ll2inum(net_interface_stat->tx_bytes);    
+}
+static VALUE rb_sigar_NetInterfaceStat_tx_packets(VALUE self)
+{
+    sigar_net_interface_stat_t *net_interface_stat;
+    Data_Get_Struct(self, sigar_net_interface_stat_t, net_interface_stat);
+    return rb_ll2inum(net_interface_stat->tx_packets);    
+}
+static VALUE rb_sigar_NetInterfaceStat_tx_errors(VALUE self)
+{
+    sigar_net_interface_stat_t *net_interface_stat;
+    Data_Get_Struct(self, sigar_net_interface_stat_t, net_interface_stat);
+    return rb_ll2inum(net_interface_stat->tx_errors);    
+}
+static VALUE rb_sigar_NetInterfaceStat_tx_dropped(VALUE self)
+{
+    sigar_net_interface_stat_t *net_interface_stat;
+    Data_Get_Struct(self, sigar_net_interface_stat_t, net_interface_stat);
+    return rb_ll2inum(net_interface_stat->tx_dropped);    
+}
+static VALUE rb_sigar_NetInterfaceStat_tx_overruns(VALUE self)
+{
+    sigar_net_interface_stat_t *net_interface_stat;
+    Data_Get_Struct(self, sigar_net_interface_stat_t, net_interface_stat);
+    return rb_ll2inum(net_interface_stat->tx_overruns);    
+}
+static VALUE rb_sigar_NetInterfaceStat_tx_collisions(VALUE self)
+{
+    sigar_net_interface_stat_t *net_interface_stat;
+    Data_Get_Struct(self, sigar_net_interface_stat_t, net_interface_stat);
+    return rb_ll2inum(net_interface_stat->tx_collisions);    
+}
+static VALUE rb_sigar_NetInterfaceStat_tx_carrier(VALUE self)
+{
+    sigar_net_interface_stat_t *net_interface_stat;
+    Data_Get_Struct(self, sigar_net_interface_stat_t, net_interface_stat);
+    return rb_ll2inum(net_interface_stat->tx_carrier);    
+}
+static VALUE rb_sigar_NetInterfaceStat_speed(VALUE self)
+{
+    sigar_net_interface_stat_t *net_interface_stat;
+    Data_Get_Struct(self, sigar_net_interface_stat_t, net_interface_stat);
+    return rb_ll2inum(net_interface_stat->speed);    
+}
+static VALUE rb_cSigarProcTime;
+
+static VALUE rb_sigar_proc_time(VALUE obj, VALUE pid)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_proc_time_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_proc_time_get(sigar, OBJ2PID(pid), RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarProcTime, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_ProcTime_start_time(VALUE self)
+{
+    sigar_proc_time_t *proc_time;
+    Data_Get_Struct(self, sigar_proc_time_t, proc_time);
+    return rb_ll2inum(proc_time->start_time);    
+}
+static VALUE rb_sigar_ProcTime_user(VALUE self)
+{
+    sigar_proc_time_t *proc_time;
+    Data_Get_Struct(self, sigar_proc_time_t, proc_time);
+    return rb_ll2inum(proc_time->user);    
+}
+static VALUE rb_sigar_ProcTime_sys(VALUE self)
+{
+    sigar_proc_time_t *proc_time;
+    Data_Get_Struct(self, sigar_proc_time_t, proc_time);
+    return rb_ll2inum(proc_time->sys);    
+}
+static VALUE rb_sigar_ProcTime_total(VALUE self)
+{
+    sigar_proc_time_t *proc_time;
+    Data_Get_Struct(self, sigar_proc_time_t, proc_time);
+    return rb_ll2inum(proc_time->total);    
+}
+static VALUE rb_sigar_Arp_ifname(VALUE self)
+{
+    sigar_arp_t *arp;
+    Data_Get_Struct(self, sigar_arp_t, arp);
+    return rb_str_new2(arp->ifname);    
+}
+static VALUE rb_sigar_Arp_hwaddr(VALUE self)
+{
+    sigar_arp_t *arp;
+    Data_Get_Struct(self, sigar_arp_t, arp);
+    return rb_sigar_net_address_to_s(arp->hwaddr);    
+}
+static VALUE rb_sigar_Arp_type(VALUE self)
+{
+    sigar_arp_t *arp;
+    Data_Get_Struct(self, sigar_arp_t, arp);
+    return rb_str_new2(arp->type);    
+}
+static VALUE rb_sigar_Arp_address(VALUE self)
+{
+    sigar_arp_t *arp;
+    Data_Get_Struct(self, sigar_arp_t, arp);
+    return rb_sigar_net_address_to_s(arp->address);    
+}
+static VALUE rb_sigar_Arp_flags(VALUE self)
+{
+    sigar_arp_t *arp;
+    Data_Get_Struct(self, sigar_arp_t, arp);
+    return rb_ll2inum(arp->flags);    
+}
+static VALUE rb_sigar_FileSystem_dir_name(VALUE self)
+{
+    sigar_file_system_t *file_system;
+    Data_Get_Struct(self, sigar_file_system_t, file_system);
+    return rb_str_new2(file_system->dir_name);    
+}
+static VALUE rb_sigar_FileSystem_dev_name(VALUE self)
+{
+    sigar_file_system_t *file_system;
+    Data_Get_Struct(self, sigar_file_system_t, file_system);
+    return rb_str_new2(file_system->dev_name);    
+}
+static VALUE rb_sigar_FileSystem_type_name(VALUE self)
+{
+    sigar_file_system_t *file_system;
+    Data_Get_Struct(self, sigar_file_system_t, file_system);
+    return rb_str_new2(file_system->type_name);    
+}
+static VALUE rb_sigar_FileSystem_sys_type_name(VALUE self)
+{
+    sigar_file_system_t *file_system;
+    Data_Get_Struct(self, sigar_file_system_t, file_system);
+    return rb_str_new2(file_system->sys_type_name);    
+}
+static VALUE rb_sigar_FileSystem_options(VALUE self)
+{
+    sigar_file_system_t *file_system;
+    Data_Get_Struct(self, sigar_file_system_t, file_system);
+    return rb_str_new2(file_system->options);    
+}
+static VALUE rb_sigar_FileSystem_type(VALUE self)
+{
+    sigar_file_system_t *file_system;
+    Data_Get_Struct(self, sigar_file_system_t, file_system);
+    return rb_int2inum(file_system->type);    
+}
+static VALUE rb_sigar_FileSystem_flags(VALUE self)
+{
+    sigar_file_system_t *file_system;
+    Data_Get_Struct(self, sigar_file_system_t, file_system);
+    return rb_ll2inum(file_system->flags);    
+}
+static VALUE rb_cSigarProcFd;
+
+static VALUE rb_sigar_proc_fd(VALUE obj, VALUE pid)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_proc_fd_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_proc_fd_get(sigar, OBJ2PID(pid), RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarProcFd, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_ProcFd_total(VALUE self)
+{
+    sigar_proc_fd_t *proc_fd;
+    Data_Get_Struct(self, sigar_proc_fd_t, proc_fd);
+    return rb_ll2inum(proc_fd->total);    
+}
+static VALUE rb_cSigarSysInfo;
+
+static VALUE rb_sigar_sys_info(VALUE obj)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_sys_info_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_sys_info_get(sigar, RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarSysInfo, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_SysInfo_name(VALUE self)
+{
+    sigar_sys_info_t *sys_info;
+    Data_Get_Struct(self, sigar_sys_info_t, sys_info);
+    return rb_str_new2(sys_info->name);    
+}
+static VALUE rb_sigar_SysInfo_version(VALUE self)
+{
+    sigar_sys_info_t *sys_info;
+    Data_Get_Struct(self, sigar_sys_info_t, sys_info);
+    return rb_str_new2(sys_info->version);    
+}
+static VALUE rb_sigar_SysInfo_arch(VALUE self)
+{
+    sigar_sys_info_t *sys_info;
+    Data_Get_Struct(self, sigar_sys_info_t, sys_info);
+    return rb_str_new2(sys_info->arch);    
+}
+static VALUE rb_sigar_SysInfo_machine(VALUE self)
+{
+    sigar_sys_info_t *sys_info;
+    Data_Get_Struct(self, sigar_sys_info_t, sys_info);
+    return rb_str_new2(sys_info->machine);    
+}
+static VALUE rb_sigar_SysInfo_description(VALUE self)
+{
+    sigar_sys_info_t *sys_info;
+    Data_Get_Struct(self, sigar_sys_info_t, sys_info);
+    return rb_str_new2(sys_info->description);    
+}
+static VALUE rb_sigar_SysInfo_patch_level(VALUE self)
+{
+    sigar_sys_info_t *sys_info;
+    Data_Get_Struct(self, sigar_sys_info_t, sys_info);
+    return rb_str_new2(sys_info->patch_level);    
+}
+static VALUE rb_sigar_SysInfo_vendor(VALUE self)
+{
+    sigar_sys_info_t *sys_info;
+    Data_Get_Struct(self, sigar_sys_info_t, sys_info);
+    return rb_str_new2(sys_info->vendor);    
+}
+static VALUE rb_sigar_SysInfo_vendor_version(VALUE self)
+{
+    sigar_sys_info_t *sys_info;
+    Data_Get_Struct(self, sigar_sys_info_t, sys_info);
+    return rb_str_new2(sys_info->vendor_version);    
+}
+static VALUE rb_sigar_SysInfo_vendor_name(VALUE self)
+{
+    sigar_sys_info_t *sys_info;
+    Data_Get_Struct(self, sigar_sys_info_t, sys_info);
+    return rb_str_new2(sys_info->vendor_name);    
+}
+static VALUE rb_sigar_SysInfo_vendor_code_name(VALUE self)
+{
+    sigar_sys_info_t *sys_info;
+    Data_Get_Struct(self, sigar_sys_info_t, sys_info);
+    return rb_str_new2(sys_info->vendor_code_name);    
+}
+static VALUE rb_cSigarDiskUsage;
+
+static VALUE rb_sigar_disk_usage(VALUE obj, VALUE name)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_disk_usage_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_disk_usage_get(sigar, StringValuePtr(name), RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarDiskUsage, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_DiskUsage_reads(VALUE self)
+{
+    sigar_disk_usage_t *disk_usage;
+    Data_Get_Struct(self, sigar_disk_usage_t, disk_usage);
+    return rb_ll2inum(disk_usage->reads);    
+}
+static VALUE rb_sigar_DiskUsage_writes(VALUE self)
+{
+    sigar_disk_usage_t *disk_usage;
+    Data_Get_Struct(self, sigar_disk_usage_t, disk_usage);
+    return rb_ll2inum(disk_usage->writes);    
+}
+static VALUE rb_sigar_DiskUsage_read_bytes(VALUE self)
+{
+    sigar_disk_usage_t *disk_usage;
+    Data_Get_Struct(self, sigar_disk_usage_t, disk_usage);
+    return rb_ll2inum(disk_usage->read_bytes);    
+}
+static VALUE rb_sigar_DiskUsage_write_bytes(VALUE self)
+{
+    sigar_disk_usage_t *disk_usage;
+    Data_Get_Struct(self, sigar_disk_usage_t, disk_usage);
+    return rb_ll2inum(disk_usage->write_bytes);    
+}
+static VALUE rb_sigar_DiskUsage_queue(VALUE self)
+{
+    sigar_disk_usage_t *disk_usage;
+    Data_Get_Struct(self, sigar_disk_usage_t, disk_usage);
+    return rb_float_new(disk_usage->queue);    
+}
+static VALUE rb_sigar_DiskUsage_service_time(VALUE self)
+{
+    sigar_disk_usage_t *disk_usage;
+    Data_Get_Struct(self, sigar_disk_usage_t, disk_usage);
+    return rb_float_new(disk_usage->service_time);    
+}
+static VALUE rb_cSigarThreadCpu;
+
+static VALUE rb_sigar_thread_cpu(VALUE obj, VALUE pid)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_thread_cpu_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_thread_cpu_get(sigar, OBJ2PID(pid), RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarThreadCpu, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_ThreadCpu_user(VALUE self)
+{
+    sigar_thread_cpu_t *thread_cpu;
+    Data_Get_Struct(self, sigar_thread_cpu_t, thread_cpu);
+    return rb_ll2inum(thread_cpu->user);    
+}
+static VALUE rb_sigar_ThreadCpu_sys(VALUE self)
+{
+    sigar_thread_cpu_t *thread_cpu;
+    Data_Get_Struct(self, sigar_thread_cpu_t, thread_cpu);
+    return rb_ll2inum(thread_cpu->sys);    
+}
+static VALUE rb_sigar_ThreadCpu_total(VALUE self)
+{
+    sigar_thread_cpu_t *thread_cpu;
+    Data_Get_Struct(self, sigar_thread_cpu_t, thread_cpu);
+    return rb_ll2inum(thread_cpu->total);    
+}
+static VALUE rb_sigar_Who_user(VALUE self)
+{
+    sigar_who_t *who;
+    Data_Get_Struct(self, sigar_who_t, who);
+    return rb_str_new2(who->user);    
+}
+static VALUE rb_sigar_Who_device(VALUE self)
+{
+    sigar_who_t *who;
+    Data_Get_Struct(self, sigar_who_t, who);
+    return rb_str_new2(who->device);    
+}
+static VALUE rb_sigar_Who_host(VALUE self)
+{
+    sigar_who_t *who;
+    Data_Get_Struct(self, sigar_who_t, who);
+    return rb_str_new2(who->host);    
+}
+static VALUE rb_sigar_Who_time(VALUE self)
+{
+    sigar_who_t *who;
+    Data_Get_Struct(self, sigar_who_t, who);
+    return rb_ll2inum(who->time);    
+}
+static VALUE rb_cSigarProcStat;
+
+static VALUE rb_sigar_proc_stat(VALUE obj)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_proc_stat_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_proc_stat_get(sigar, RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarProcStat, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_ProcStat_total(VALUE self)
+{
+    sigar_proc_stat_t *proc_stat;
+    Data_Get_Struct(self, sigar_proc_stat_t, proc_stat);
+    return rb_ll2inum(proc_stat->total);    
+}
+static VALUE rb_sigar_ProcStat_idle(VALUE self)
+{
+    sigar_proc_stat_t *proc_stat;
+    Data_Get_Struct(self, sigar_proc_stat_t, proc_stat);
+    return rb_ll2inum(proc_stat->idle);    
+}
+static VALUE rb_sigar_ProcStat_running(VALUE self)
+{
+    sigar_proc_stat_t *proc_stat;
+    Data_Get_Struct(self, sigar_proc_stat_t, proc_stat);
+    return rb_ll2inum(proc_stat->running);    
+}
+static VALUE rb_sigar_ProcStat_sleeping(VALUE self)
+{
+    sigar_proc_stat_t *proc_stat;
+    Data_Get_Struct(self, sigar_proc_stat_t, proc_stat);
+    return rb_ll2inum(proc_stat->sleeping);    
+}
+static VALUE rb_sigar_ProcStat_stopped(VALUE self)
+{
+    sigar_proc_stat_t *proc_stat;
+    Data_Get_Struct(self, sigar_proc_stat_t, proc_stat);
+    return rb_ll2inum(proc_stat->stopped);    
+}
+static VALUE rb_sigar_ProcStat_zombie(VALUE self)
+{
+    sigar_proc_stat_t *proc_stat;
+    Data_Get_Struct(self, sigar_proc_stat_t, proc_stat);
+    return rb_ll2inum(proc_stat->zombie);    
+}
+static VALUE rb_sigar_ProcStat_threads(VALUE self)
+{
+    sigar_proc_stat_t *proc_stat;
+    Data_Get_Struct(self, sigar_proc_stat_t, proc_stat);
+    return rb_ll2inum(proc_stat->threads);    
+}
+static VALUE rb_cSigarProcState;
+
+static VALUE rb_sigar_proc_state(VALUE obj, VALUE pid)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_proc_state_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_proc_state_get(sigar, OBJ2PID(pid), RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarProcState, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_ProcState_state(VALUE self)
+{
+    sigar_proc_state_t *proc_state;
+    Data_Get_Struct(self, sigar_proc_state_t, proc_state);
+    return CHR2FIX(proc_state->state);    
+}
+static VALUE rb_sigar_ProcState_name(VALUE self)
+{
+    sigar_proc_state_t *proc_state;
+    Data_Get_Struct(self, sigar_proc_state_t, proc_state);
+    return rb_str_new2(proc_state->name);    
+}
+static VALUE rb_sigar_ProcState_ppid(VALUE self)
+{
+    sigar_proc_state_t *proc_state;
+    Data_Get_Struct(self, sigar_proc_state_t, proc_state);
+    return rb_ll2inum(proc_state->ppid);    
+}
+static VALUE rb_sigar_ProcState_tty(VALUE self)
+{
+    sigar_proc_state_t *proc_state;
+    Data_Get_Struct(self, sigar_proc_state_t, proc_state);
+    return rb_int2inum(proc_state->tty);    
+}
+static VALUE rb_sigar_ProcState_nice(VALUE self)
+{
+    sigar_proc_state_t *proc_state;
+    Data_Get_Struct(self, sigar_proc_state_t, proc_state);
+    return rb_int2inum(proc_state->nice);    
+}
+static VALUE rb_sigar_ProcState_priority(VALUE self)
+{
+    sigar_proc_state_t *proc_state;
+    Data_Get_Struct(self, sigar_proc_state_t, proc_state);
+    return rb_int2inum(proc_state->priority);    
+}
+static VALUE rb_sigar_ProcState_threads(VALUE self)
+{
+    sigar_proc_state_t *proc_state;
+    Data_Get_Struct(self, sigar_proc_state_t, proc_state);
+    return rb_ll2inum(proc_state->threads);    
+}
+static VALUE rb_sigar_ProcState_processor(VALUE self)
+{
+    sigar_proc_state_t *proc_state;
+    Data_Get_Struct(self, sigar_proc_state_t, proc_state);
+    return rb_int2inum(proc_state->processor);    
+}
+static VALUE rb_cSigarResourceLimit;
+
+static VALUE rb_sigar_resource_limit(VALUE obj)
+{
+    SIGAR_GET;
+
+    int status;
+    sigar_resource_limit_t *RETVAL  = malloc(sizeof(*RETVAL));
+
+    if ((status = sigar_resource_limit_get(sigar, RETVAL)) != SIGAR_OK) {
+        free(RETVAL);
+        rb_raise(rb_eArgError, "%s", sigar_strerror(sigar, status));
+        return Qnil;
+    }
+
+    return Data_Wrap_Struct(rb_cSigarResourceLimit, 0, rb_sigar_free, RETVAL);
+}
+static VALUE rb_sigar_ResourceLimit_cpu_cur(VALUE self)
+{
+    sigar_resource_limit_t *resource_limit;
+    Data_Get_Struct(self, sigar_resource_limit_t, resource_limit);
+    return rb_ll2inum(resource_limit->cpu_cur);    
+}
+static VALUE rb_sigar_ResourceLimit_cpu_max(VALUE self)
+{
+    sigar_resource_limit_t *resource_limit;
+    Data_Get_Struct(self, sigar_resource_limit_t, resource_limit);
+    return rb_ll2inum(resource_limit->cpu_max);    
+}
+static VALUE rb_sigar_ResourceLimit_file_size_cur(VALUE self)
+{
+    sigar_resource_limit_t *resource_limit;
+    Data_Get_Struct(self, sigar_resource_limit_t, resource_limit);
+    return rb_ll2inum(resource_limit->file_size_cur);    
+}
+static VALUE rb_sigar_ResourceLimit_file_size_max(VALUE self)
+{
+    sigar_resource_limit_t *resource_limit;
+    Data_Get_Struct(self, sigar_resource_limit_t, resource_limit);
+    return rb_ll2inum(resource_limit->file_size_max);    
+}
+static VALUE rb_sigar_ResourceLimit_pipe_size_max(VALUE self)
+{
+    sigar_resource_limit_t *resource_limit;
+    Data_Get_Struct(self, sigar_resource_limit_t, resource_limit);
+    return rb_ll2inum(resource_limit->pipe_size_max);    
+}
+static VALUE rb_sigar_ResourceLimit_pipe_size_cur(VALUE self)
+{
+    sigar_resource_limit_t *resource_limit;
+    Data_Get_Struct(self, sigar_resource_limit_t, resource_limit);
+    return rb_ll2inum(resource_limit->pipe_size_cur);    
+}
+static VALUE rb_sigar_ResourceLimit_data_cur(VALUE self)
+{
+    sigar_resource_limit_t *resource_limit;
+    Data_Get_Struct(self, sigar_resource_limit_t, resource_limit);
+    return rb_ll2inum(resource_limit->data_cur);    
+}
+static VALUE rb_sigar_ResourceLimit_data_max(VALUE self)
+{
+    sigar_resource_limit_t *resource_limit;
+    Data_Get_Struct(self, sigar_resource_limit_t, resource_limit);
+    return rb_ll2inum(resource_limit->data_max);    
+}
+static VALUE rb_sigar_ResourceLimit_stack_cur(VALUE self)
+{
+    sigar_resource_limit_t *resource_limit;
+    Data_Get_Struct(self, sigar_resource_limit_t, resource_limit);
+    return rb_ll2inum(resource_limit->stack_cur);    
+}
+static VALUE rb_sigar_ResourceLimit_stack_max(VALUE self)
+{
+    sigar_resource_limit_t *resource_limit;
+    Data_Get_Struct(self, sigar_resource_limit_t, resource_limit);
+    return rb_ll2inum(resource_limit->stack_max);    
+}
+static VALUE rb_sigar_ResourceLimit_core_cur(VALUE self)
+{
+    sigar_resource_limit_t *resource_limit;
+    Data_Get_Struct(self, sigar_resource_limit_t, resource_limit);
+    return rb_ll2inum(resource_limit->core_cur);    
+}
+static VALUE rb_sigar_ResourceLimit_core_max(VALUE self)
+{
+    sigar_resource_limit_t *resource_limit;
+    Data_Get_Struct(self, sigar_resource_limit_t, resource_limit);
+    return rb_ll2inum(resource_limit->core_max);    
+}
+static VALUE rb_sigar_ResourceLimit_memory_cur(VALUE self)
+{
+    sigar_resource_limit_t *resource_limit;
+    Data_Get_Struct(self, sigar_resource_limit_t, resource_limit);
+    return rb_ll2inum(resource_limit->memory_cur);    
+}
+static VALUE rb_sigar_ResourceLimit_memory_max(VALUE self)
+{
+    sigar_resource_limit_t *resource_limit;
+    Data_Get_Struct(self, sigar_resource_limit_t, resource_limit);
+    return rb_ll2inum(resource_limit->memory_max);    
+}
+static VALUE rb_sigar_ResourceLimit_processes_cur(VALUE self)
+{
+    sigar_resource_limit_t *resource_limit;
+    Data_Get_Struct(self, sigar_resource_limit_t, resource_limit);
+    return rb_ll2inum(resource_limit->processes_cur);    
+}
+static VALUE rb_sigar_ResourceLimit_processes_max(VALUE self)
+{
+    sigar_resource_limit_t *resource_limit;
+    Data_Get_Struct(self, sigar_resource_limit_t, resource_limit);
+    return rb_ll2inum(resource_limit->processes_max);    
+}
+static VALUE rb_sigar_ResourceLimit_open_files_cur(VALUE self)
+{
+    sigar_resource_limit_t *resource_limit;
+    Data_Get_Struct(self, sigar_resource_limit_t, resource_limit);
+    return rb_ll2inum(resource_limit->open_files_cur);    
+}
+static VALUE rb_sigar_ResourceLimit_open_files_max(VALUE self)
+{
+    sigar_resource_limit_t *resource_limit;
+    Data_Get_Struct(self, sigar_resource_limit_t, resource_limit);
+    return rb_ll2inum(resource_limit->open_files_max);    
+}
+static VALUE rb_sigar_ResourceLimit_virtual_memory_cur(VALUE self)
+{
+    sigar_resource_limit_t *resource_limit;
+    Data_Get_Struct(self, sigar_resource_limit_t, resource_limit);
+    return rb_ll2inum(resource_limit->virtual_memory_cur);    
+}
+static VALUE rb_sigar_ResourceLimit_virtual_memory_max(VALUE self)
+{
+    sigar_resource_limit_t *resource_limit;
+    Data_Get_Struct(self, sigar_resource_limit_t, resource_limit);
+    return rb_ll2inum(resource_limit->virtual_memory_max);    
+}
+static void rb_sigar_define_module_methods(VALUE rclass)
+{
+    rb_define_method(rclass, "uptime", rb_sigar_uptime, 0);
+    rb_define_method(rclass, "net_interface_config", rb_sigar_net_interface_config, 1);
+    rb_define_method(rclass, "proc_exe", rb_sigar_proc_exe, 1);
+    rb_define_method(rclass, "dump_pid_cache", rb_sigar_dump_pid_cache, 0);
+    rb_define_method(rclass, "file_system_usage", rb_sigar_file_system_usage, 1);
+    rb_define_method(rclass, "swap", rb_sigar_swap, 0);
+    rb_define_method(rclass, "proc_mem", rb_sigar_proc_mem, 1);
+    rb_define_method(rclass, "net_info", rb_sigar_net_info, 0);
+    rb_define_method(rclass, "nfs_server_v2", rb_sigar_nfs_server_v2, 0);
+    rb_define_method(rclass, "nfs_client_v3", rb_sigar_nfs_client_v3, 0);
+    rb_define_method(rclass, "proc_disk_io", rb_sigar_proc_disk_io, 1);
+    rb_define_method(rclass, "proc_cred_name", rb_sigar_proc_cred_name, 1);
+    rb_define_method(rclass, "nfs_client_v2", rb_sigar_nfs_client_v2, 0);
+    rb_define_method(rclass, "file_attrs", rb_sigar_file_attrs, 1);
+    rb_define_method(rclass, "proc_cred", rb_sigar_proc_cred, 1);
+    rb_define_method(rclass, "dir_usage", rb_sigar_dir_usage, 1);
+    rb_define_method(rclass, "nfs_server_v3", rb_sigar_nfs_server_v3, 0);
+    rb_define_method(rclass, "dir_stat", rb_sigar_dir_stat, 1);
+    rb_define_method(rclass, "tcp", rb_sigar_tcp, 0);
+    rb_define_method(rclass, "proc_cumulative_disk_io", rb_sigar_proc_cumulative_disk_io, 1);
+    rb_define_method(rclass, "cpu", rb_sigar_cpu, 0);
+    rb_define_method(rclass, "proc_cpu", rb_sigar_proc_cpu, 1);
+    rb_define_method(rclass, "mem", rb_sigar_mem, 0);
+    rb_define_method(rclass, "net_interface_stat", rb_sigar_net_interface_stat, 1);
+    rb_define_method(rclass, "proc_time", rb_sigar_proc_time, 1);
+    rb_define_method(rclass, "proc_fd", rb_sigar_proc_fd, 1);
+    rb_define_method(rclass, "sys_info", rb_sigar_sys_info, 0);
+    rb_define_method(rclass, "disk_usage", rb_sigar_disk_usage, 1);
+    rb_define_method(rclass, "thread_cpu", rb_sigar_thread_cpu, 1);
+    rb_define_method(rclass, "proc_stat", rb_sigar_proc_stat, 0);
+    rb_define_method(rclass, "proc_state", rb_sigar_proc_state, 1);
+    rb_define_method(rclass, "resource_limit", rb_sigar_resource_limit, 0);
+    rb_cSigarArp = rb_define_class_under(rclass, "Arp", rb_cObject);
+    rb_define_method(rb_cSigarArp, "ifname", rb_sigar_Arp_ifname, 0);
+    rb_define_method(rb_cSigarArp, "hwaddr", rb_sigar_Arp_hwaddr, 0);
+    rb_define_method(rb_cSigarArp, "type", rb_sigar_Arp_type, 0);
+    rb_define_method(rb_cSigarArp, "address", rb_sigar_Arp_address, 0);
+    rb_define_method(rb_cSigarArp, "flags", rb_sigar_Arp_flags, 0);
+    rb_cSigarCpu = rb_define_class_under(rclass, "Cpu", rb_cObject);
+    rb_define_method(rb_cSigarCpu, "user", rb_sigar_Cpu_user, 0);
+    rb_define_method(rb_cSigarCpu, "sys", rb_sigar_Cpu_sys, 0);
+    rb_define_method(rb_cSigarCpu, "nice", rb_sigar_Cpu_nice, 0);
+    rb_define_method(rb_cSigarCpu, "idle", rb_sigar_Cpu_idle, 0);
+    rb_define_method(rb_cSigarCpu, "wait", rb_sigar_Cpu_wait, 0);
+    rb_define_method(rb_cSigarCpu, "irq", rb_sigar_Cpu_irq, 0);
+    rb_define_method(rb_cSigarCpu, "soft_irq", rb_sigar_Cpu_soft_irq, 0);
+    rb_define_method(rb_cSigarCpu, "stolen", rb_sigar_Cpu_stolen, 0);
+    rb_define_method(rb_cSigarCpu, "total", rb_sigar_Cpu_total, 0);
+    rb_cSigarCpuInfo = rb_define_class_under(rclass, "CpuInfo", rb_cObject);
+    rb_define_method(rb_cSigarCpuInfo, "vendor", rb_sigar_CpuInfo_vendor, 0);
+    rb_define_method(rb_cSigarCpuInfo, "model", rb_sigar_CpuInfo_model, 0);
+    rb_define_method(rb_cSigarCpuInfo, "mhz", rb_sigar_CpuInfo_mhz, 0);
+    rb_define_method(rb_cSigarCpuInfo, "mhz_max", rb_sigar_CpuInfo_mhz_max, 0);
+    rb_define_method(rb_cSigarCpuInfo, "mhz_min", rb_sigar_CpuInfo_mhz_min, 0);
+    rb_define_method(rb_cSigarCpuInfo, "cache_size", rb_sigar_CpuInfo_cache_size, 0);
+    rb_define_method(rb_cSigarCpuInfo, "total_cores", rb_sigar_CpuInfo_total_cores, 0);
+    rb_define_method(rb_cSigarCpuInfo, "total_sockets", rb_sigar_CpuInfo_total_sockets, 0);
+    rb_define_method(rb_cSigarCpuInfo, "cores_per_socket", rb_sigar_CpuInfo_cores_per_socket, 0);
+    rb_cSigarCpuPerc = rb_define_class_under(rclass, "CpuPerc", rb_cObject);
+    rb_define_method(rb_cSigarCpuPerc, "user", rb_sigar_CpuPerc_user, 0);
+    rb_define_method(rb_cSigarCpuPerc, "sys", rb_sigar_CpuPerc_sys, 0);
+    rb_define_method(rb_cSigarCpuPerc, "nice", rb_sigar_CpuPerc_nice, 0);
+    rb_define_method(rb_cSigarCpuPerc, "idle", rb_sigar_CpuPerc_idle, 0);
+    rb_define_method(rb_cSigarCpuPerc, "wait", rb_sigar_CpuPerc_wait, 0);
+    rb_define_method(rb_cSigarCpuPerc, "irq", rb_sigar_CpuPerc_irq, 0);
+    rb_define_method(rb_cSigarCpuPerc, "soft_irq", rb_sigar_CpuPerc_soft_irq, 0);
+    rb_define_method(rb_cSigarCpuPerc, "stolen", rb_sigar_CpuPerc_stolen, 0);
+    rb_define_method(rb_cSigarCpuPerc, "combined", rb_sigar_CpuPerc_combined, 0);
+    rb_cSigarDirStat = rb_define_class_under(rclass, "DirStat", rb_cObject);
+    rb_define_method(rb_cSigarDirStat, "total", rb_sigar_DirStat_total, 0);
+    rb_define_method(rb_cSigarDirStat, "files", rb_sigar_DirStat_files, 0);
+    rb_define_method(rb_cSigarDirStat, "subdirs", rb_sigar_DirStat_subdirs, 0);
+    rb_define_method(rb_cSigarDirStat, "symlinks", rb_sigar_DirStat_symlinks, 0);
+    rb_define_method(rb_cSigarDirStat, "chrdevs", rb_sigar_DirStat_chrdevs, 0);
+    rb_define_method(rb_cSigarDirStat, "blkdevs", rb_sigar_DirStat_blkdevs, 0);
+    rb_define_method(rb_cSigarDirStat, "sockets", rb_sigar_DirStat_sockets, 0);
+    rb_define_method(rb_cSigarDirStat, "disk_usage", rb_sigar_DirStat_disk_usage, 0);
+    rb_cSigarDirUsage = rb_define_class_under(rclass, "DirUsage", rb_cObject);
+    rb_define_method(rb_cSigarDirUsage, "total", rb_sigar_DirUsage_total, 0);
+    rb_define_method(rb_cSigarDirUsage, "files", rb_sigar_DirUsage_files, 0);
+    rb_define_method(rb_cSigarDirUsage, "subdirs", rb_sigar_DirUsage_subdirs, 0);
+    rb_define_method(rb_cSigarDirUsage, "symlinks", rb_sigar_DirUsage_symlinks, 0);
+    rb_define_method(rb_cSigarDirUsage, "chrdevs", rb_sigar_DirUsage_chrdevs, 0);
+    rb_define_method(rb_cSigarDirUsage, "blkdevs", rb_sigar_DirUsage_blkdevs, 0);
+    rb_define_method(rb_cSigarDirUsage, "sockets", rb_sigar_DirUsage_sockets, 0);
+    rb_define_method(rb_cSigarDirUsage, "disk_usage", rb_sigar_DirUsage_disk_usage, 0);
+    rb_cSigarDiskUsage = rb_define_class_under(rclass, "DiskUsage", rb_cObject);
+    rb_define_method(rb_cSigarDiskUsage, "reads", rb_sigar_DiskUsage_reads, 0);
+    rb_define_method(rb_cSigarDiskUsage, "writes", rb_sigar_DiskUsage_writes, 0);
+    rb_define_method(rb_cSigarDiskUsage, "read_bytes", rb_sigar_DiskUsage_read_bytes, 0);
+    rb_define_method(rb_cSigarDiskUsage, "write_bytes", rb_sigar_DiskUsage_write_bytes, 0);
+    rb_define_method(rb_cSigarDiskUsage, "queue", rb_sigar_DiskUsage_queue, 0);
+    rb_define_method(rb_cSigarDiskUsage, "service_time", rb_sigar_DiskUsage_service_time, 0);
+    rb_cSigarDumpPidCache = rb_define_class_under(rclass, "DumpPidCache", rb_cObject);
+    rb_define_method(rb_cSigarDumpPidCache, "dummy", rb_sigar_DumpPidCache_dummy, 0);
+    rb_cSigarFileAttrs = rb_define_class_under(rclass, "FileAttrs", rb_cObject);
+    rb_define_method(rb_cSigarFileAttrs, "permissions", rb_sigar_FileAttrs_permissions, 0);
+    rb_define_method(rb_cSigarFileAttrs, "type", rb_sigar_FileAttrs_type, 0);
+    rb_define_method(rb_cSigarFileAttrs, "uid", rb_sigar_FileAttrs_uid, 0);
+    rb_define_method(rb_cSigarFileAttrs, "gid", rb_sigar_FileAttrs_gid, 0);
+    rb_define_method(rb_cSigarFileAttrs, "inode", rb_sigar_FileAttrs_inode, 0);
+    rb_define_method(rb_cSigarFileAttrs, "device", rb_sigar_FileAttrs_device, 0);
+    rb_define_method(rb_cSigarFileAttrs, "nlink", rb_sigar_FileAttrs_nlink, 0);
+    rb_define_method(rb_cSigarFileAttrs, "size", rb_sigar_FileAttrs_size, 0);
+    rb_define_method(rb_cSigarFileAttrs, "atime", rb_sigar_FileAttrs_atime, 0);
+    rb_define_method(rb_cSigarFileAttrs, "ctime", rb_sigar_FileAttrs_ctime, 0);
+    rb_define_method(rb_cSigarFileAttrs, "mtime", rb_sigar_FileAttrs_mtime, 0);
+    rb_cSigarFileSystem = rb_define_class_under(rclass, "FileSystem", rb_cObject);
+    rb_define_method(rb_cSigarFileSystem, "dir_name", rb_sigar_FileSystem_dir_name, 0);
+    rb_define_method(rb_cSigarFileSystem, "dev_name", rb_sigar_FileSystem_dev_name, 0);
+    rb_define_method(rb_cSigarFileSystem, "type_name", rb_sigar_FileSystem_type_name, 0);
+    rb_define_method(rb_cSigarFileSystem, "sys_type_name", rb_sigar_FileSystem_sys_type_name, 0);
+    rb_define_method(rb_cSigarFileSystem, "options", rb_sigar_FileSystem_options, 0);
+    rb_define_method(rb_cSigarFileSystem, "type", rb_sigar_FileSystem_type, 0);
+    rb_define_method(rb_cSigarFileSystem, "flags", rb_sigar_FileSystem_flags, 0);
+    rb_cSigarFileSystemUsage = rb_define_class_under(rclass, "FileSystemUsage", rb_cObject);
+    rb_define_method(rb_cSigarFileSystemUsage, "total", rb_sigar_FileSystemUsage_total, 0);
+    rb_define_method(rb_cSigarFileSystemUsage, "free", rb_sigar_FileSystemUsage_free, 0);
+    rb_define_method(rb_cSigarFileSystemUsage, "used", rb_sigar_FileSystemUsage_used, 0);
+    rb_define_method(rb_cSigarFileSystemUsage, "avail", rb_sigar_FileSystemUsage_avail, 0);
+    rb_define_method(rb_cSigarFileSystemUsage, "files", rb_sigar_FileSystemUsage_files, 0);
+    rb_define_method(rb_cSigarFileSystemUsage, "free_files", rb_sigar_FileSystemUsage_free_files, 0);
+    rb_define_method(rb_cSigarFileSystemUsage, "disk_reads", rb_sigar_FileSystemUsage_disk_reads, 0);
+    rb_define_method(rb_cSigarFileSystemUsage, "disk_writes", rb_sigar_FileSystemUsage_disk_writes, 0);
+    rb_define_method(rb_cSigarFileSystemUsage, "disk_read_bytes", rb_sigar_FileSystemUsage_disk_read_bytes, 0);
+    rb_define_method(rb_cSigarFileSystemUsage, "disk_write_bytes", rb_sigar_FileSystemUsage_disk_write_bytes, 0);
+    rb_define_method(rb_cSigarFileSystemUsage, "disk_queue", rb_sigar_FileSystemUsage_disk_queue, 0);
+    rb_define_method(rb_cSigarFileSystemUsage, "disk_service_time", rb_sigar_FileSystemUsage_disk_service_time, 0);
+    rb_define_method(rb_cSigarFileSystemUsage, "use_percent", rb_sigar_FileSystemUsage_use_percent, 0);
+    rb_cSigarMem = rb_define_class_under(rclass, "Mem", rb_cObject);
+    rb_define_method(rb_cSigarMem, "total", rb_sigar_Mem_total, 0);
+    rb_define_method(rb_cSigarMem, "ram", rb_sigar_Mem_ram, 0);
+    rb_define_method(rb_cSigarMem, "used", rb_sigar_Mem_used, 0);
+    rb_define_method(rb_cSigarMem, "free", rb_sigar_Mem_free, 0);
+    rb_define_method(rb_cSigarMem, "actual_used", rb_sigar_Mem_actual_used, 0);
+    rb_define_method(rb_cSigarMem, "actual_free", rb_sigar_Mem_actual_free, 0);
+    rb_define_method(rb_cSigarMem, "used_percent", rb_sigar_Mem_used_percent, 0);
+    rb_define_method(rb_cSigarMem, "free_percent", rb_sigar_Mem_free_percent, 0);
+    rb_cSigarNetConnection = rb_define_class_under(rclass, "NetConnection", rb_cObject);
+    rb_define_method(rb_cSigarNetConnection, "local_port", rb_sigar_NetConnection_local_port, 0);
+    rb_define_method(rb_cSigarNetConnection, "local_address", rb_sigar_NetConnection_local_address, 0);
+    rb_define_method(rb_cSigarNetConnection, "remote_port", rb_sigar_NetConnection_remote_port, 0);
+    rb_define_method(rb_cSigarNetConnection, "remote_address", rb_sigar_NetConnection_remote_address, 0);
+    rb_define_method(rb_cSigarNetConnection, "type", rb_sigar_NetConnection_type, 0);
+    rb_define_method(rb_cSigarNetConnection, "state", rb_sigar_NetConnection_state, 0);
+    rb_define_method(rb_cSigarNetConnection, "send_queue", rb_sigar_NetConnection_send_queue, 0);
+    rb_define_method(rb_cSigarNetConnection, "receive_queue", rb_sigar_NetConnection_receive_queue, 0);
+    rb_cSigarNetInfo = rb_define_class_under(rclass, "NetInfo", rb_cObject);
+    rb_define_method(rb_cSigarNetInfo, "default_gateway", rb_sigar_NetInfo_default_gateway, 0);
+    rb_define_method(rb_cSigarNetInfo, "default_gateway_interface", rb_sigar_NetInfo_default_gateway_interface, 0);
+    rb_define_method(rb_cSigarNetInfo, "host_name", rb_sigar_NetInfo_host_name, 0);
+    rb_define_method(rb_cSigarNetInfo, "domain_name", rb_sigar_NetInfo_domain_name, 0);
+    rb_define_method(rb_cSigarNetInfo, "primary_dns", rb_sigar_NetInfo_primary_dns, 0);
+    rb_define_method(rb_cSigarNetInfo, "secondary_dns", rb_sigar_NetInfo_secondary_dns, 0);
+    rb_cSigarNetInterfaceConfig = rb_define_class_under(rclass, "NetInterfaceConfig", rb_cObject);
+    rb_define_method(rb_cSigarNetInterfaceConfig, "name", rb_sigar_NetInterfaceConfig_name, 0);
+    rb_define_method(rb_cSigarNetInterfaceConfig, "hwaddr", rb_sigar_NetInterfaceConfig_hwaddr, 0);
+    rb_define_method(rb_cSigarNetInterfaceConfig, "type", rb_sigar_NetInterfaceConfig_type, 0);
+    rb_define_method(rb_cSigarNetInterfaceConfig, "description", rb_sigar_NetInterfaceConfig_description, 0);
+    rb_define_method(rb_cSigarNetInterfaceConfig, "address", rb_sigar_NetInterfaceConfig_address, 0);
+    rb_define_method(rb_cSigarNetInterfaceConfig, "address6", rb_sigar_NetInterfaceConfig_address6, 0);
+    rb_define_method(rb_cSigarNetInterfaceConfig, "prefix6_length", rb_sigar_NetInterfaceConfig_prefix6_length, 0);
+    rb_define_method(rb_cSigarNetInterfaceConfig, "scope6", rb_sigar_NetInterfaceConfig_scope6, 0);
+    rb_define_method(rb_cSigarNetInterfaceConfig, "destination", rb_sigar_NetInterfaceConfig_destination, 0);
+    rb_define_method(rb_cSigarNetInterfaceConfig, "broadcast", rb_sigar_NetInterfaceConfig_broadcast, 0);
+    rb_define_method(rb_cSigarNetInterfaceConfig, "netmask", rb_sigar_NetInterfaceConfig_netmask, 0);
+    rb_define_method(rb_cSigarNetInterfaceConfig, "flags", rb_sigar_NetInterfaceConfig_flags, 0);
+    rb_define_method(rb_cSigarNetInterfaceConfig, "mtu", rb_sigar_NetInterfaceConfig_mtu, 0);
+    rb_define_method(rb_cSigarNetInterfaceConfig, "metric", rb_sigar_NetInterfaceConfig_metric, 0);
+    rb_define_method(rb_cSigarNetInterfaceConfig, "tx_queue_len", rb_sigar_NetInterfaceConfig_tx_queue_len, 0);
+    rb_cSigarNetInterfaceStat = rb_define_class_under(rclass, "NetInterfaceStat", rb_cObject);
+    rb_define_method(rb_cSigarNetInterfaceStat, "rx_bytes", rb_sigar_NetInterfaceStat_rx_bytes, 0);
+    rb_define_method(rb_cSigarNetInterfaceStat, "rx_packets", rb_sigar_NetInterfaceStat_rx_packets, 0);
+    rb_define_method(rb_cSigarNetInterfaceStat, "rx_errors", rb_sigar_NetInterfaceStat_rx_errors, 0);
+    rb_define_method(rb_cSigarNetInterfaceStat, "rx_dropped", rb_sigar_NetInterfaceStat_rx_dropped, 0);
+    rb_define_method(rb_cSigarNetInterfaceStat, "rx_overruns", rb_sigar_NetInterfaceStat_rx_overruns, 0);
+    rb_define_method(rb_cSigarNetInterfaceStat, "rx_frame", rb_sigar_NetInterfaceStat_rx_frame, 0);
+    rb_define_method(rb_cSigarNetInterfaceStat, "tx_bytes", rb_sigar_NetInterfaceStat_tx_bytes, 0);
+    rb_define_method(rb_cSigarNetInterfaceStat, "tx_packets", rb_sigar_NetInterfaceStat_tx_packets, 0);
+    rb_define_method(rb_cSigarNetInterfaceStat, "tx_errors", rb_sigar_NetInterfaceStat_tx_errors, 0);
+    rb_define_method(rb_cSigarNetInterfaceStat, "tx_dropped", rb_sigar_NetInterfaceStat_tx_dropped, 0);
+    rb_define_method(rb_cSigarNetInterfaceStat, "tx_overruns", rb_sigar_NetInterfaceStat_tx_overruns, 0);
+    rb_define_method(rb_cSigarNetInterfaceStat, "tx_collisions", rb_sigar_NetInterfaceStat_tx_collisions, 0);
+    rb_define_method(rb_cSigarNetInterfaceStat, "tx_carrier", rb_sigar_NetInterfaceStat_tx_carrier, 0);
+    rb_define_method(rb_cSigarNetInterfaceStat, "speed", rb_sigar_NetInterfaceStat_speed, 0);
+    rb_cSigarNetRoute = rb_define_class_under(rclass, "NetRoute", rb_cObject);
+    rb_define_method(rb_cSigarNetRoute, "destination", rb_sigar_NetRoute_destination, 0);
+    rb_define_method(rb_cSigarNetRoute, "gateway", rb_sigar_NetRoute_gateway, 0);
+    rb_define_method(rb_cSigarNetRoute, "flags", rb_sigar_NetRoute_flags, 0);
+    rb_define_method(rb_cSigarNetRoute, "refcnt", rb_sigar_NetRoute_refcnt, 0);
+    rb_define_method(rb_cSigarNetRoute, "use", rb_sigar_NetRoute_use, 0);
+    rb_define_method(rb_cSigarNetRoute, "metric", rb_sigar_NetRoute_metric, 0);
+    rb_define_method(rb_cSigarNetRoute, "mask", rb_sigar_NetRoute_mask, 0);
+    rb_define_method(rb_cSigarNetRoute, "mtu", rb_sigar_NetRoute_mtu, 0);
+    rb_define_method(rb_cSigarNetRoute, "window", rb_sigar_NetRoute_window, 0);
+    rb_define_method(rb_cSigarNetRoute, "irtt", rb_sigar_NetRoute_irtt, 0);
+    rb_define_method(rb_cSigarNetRoute, "ifname", rb_sigar_NetRoute_ifname, 0);
+    rb_cSigarNetStat = rb_define_class_under(rclass, "NetStat", rb_cObject);
+    rb_define_method(rb_cSigarNetStat, "tcp_inbound_total", rb_sigar_NetStat_tcp_inbound_total, 0);
+    rb_define_method(rb_cSigarNetStat, "tcp_outbound_total", rb_sigar_NetStat_tcp_outbound_total, 0);
+    rb_define_method(rb_cSigarNetStat, "all_inbound_total", rb_sigar_NetStat_all_inbound_total, 0);
+    rb_define_method(rb_cSigarNetStat, "all_outbound_total", rb_sigar_NetStat_all_outbound_total, 0);
+    rb_cSigarNfsClientV2 = rb_define_class_under(rclass, "NfsClientV2", rb_cObject);
+    rb_define_method(rb_cSigarNfsClientV2, "null", rb_sigar_NfsClientV2_null, 0);
+    rb_define_method(rb_cSigarNfsClientV2, "getattr", rb_sigar_NfsClientV2_getattr, 0);
+    rb_define_method(rb_cSigarNfsClientV2, "setattr", rb_sigar_NfsClientV2_setattr, 0);
+    rb_define_method(rb_cSigarNfsClientV2, "root", rb_sigar_NfsClientV2_root, 0);
+    rb_define_method(rb_cSigarNfsClientV2, "lookup", rb_sigar_NfsClientV2_lookup, 0);
+    rb_define_method(rb_cSigarNfsClientV2, "readlink", rb_sigar_NfsClientV2_readlink, 0);
+    rb_define_method(rb_cSigarNfsClientV2, "read", rb_sigar_NfsClientV2_read, 0);
+    rb_define_method(rb_cSigarNfsClientV2, "writecache", rb_sigar_NfsClientV2_writecache, 0);
+    rb_define_method(rb_cSigarNfsClientV2, "write", rb_sigar_NfsClientV2_write, 0);
+    rb_define_method(rb_cSigarNfsClientV2, "create", rb_sigar_NfsClientV2_create, 0);
+    rb_define_method(rb_cSigarNfsClientV2, "remove", rb_sigar_NfsClientV2_remove, 0);
+    rb_define_method(rb_cSigarNfsClientV2, "rename", rb_sigar_NfsClientV2_rename, 0);
+    rb_define_method(rb_cSigarNfsClientV2, "link", rb_sigar_NfsClientV2_link, 0);
+    rb_define_method(rb_cSigarNfsClientV2, "symlink", rb_sigar_NfsClientV2_symlink, 0);
+    rb_define_method(rb_cSigarNfsClientV2, "mkdir", rb_sigar_NfsClientV2_mkdir, 0);
+    rb_define_method(rb_cSigarNfsClientV2, "rmdir", rb_sigar_NfsClientV2_rmdir, 0);
+    rb_define_method(rb_cSigarNfsClientV2, "readdir", rb_sigar_NfsClientV2_readdir, 0);
+    rb_define_method(rb_cSigarNfsClientV2, "fsstat", rb_sigar_NfsClientV2_fsstat, 0);
+    rb_cSigarNfsClientV3 = rb_define_class_under(rclass, "NfsClientV3", rb_cObject);
+    rb_define_method(rb_cSigarNfsClientV3, "null", rb_sigar_NfsClientV3_null, 0);
+    rb_define_method(rb_cSigarNfsClientV3, "getattr", rb_sigar_NfsClientV3_getattr, 0);
+    rb_define_method(rb_cSigarNfsClientV3, "setattr", rb_sigar_NfsClientV3_setattr, 0);
+    rb_define_method(rb_cSigarNfsClientV3, "lookup", rb_sigar_NfsClientV3_lookup, 0);
+    rb_define_method(rb_cSigarNfsClientV3, "access", rb_sigar_NfsClientV3_access, 0);
+    rb_define_method(rb_cSigarNfsClientV3, "readlink", rb_sigar_NfsClientV3_readlink, 0);
+    rb_define_method(rb_cSigarNfsClientV3, "read", rb_sigar_NfsClientV3_read, 0);
+    rb_define_method(rb_cSigarNfsClientV3, "write", rb_sigar_NfsClientV3_write, 0);
+    rb_define_method(rb_cSigarNfsClientV3, "create", rb_sigar_NfsClientV3_create, 0);
+    rb_define_method(rb_cSigarNfsClientV3, "mkdir", rb_sigar_NfsClientV3_mkdir, 0);
+    rb_define_method(rb_cSigarNfsClientV3, "symlink", rb_sigar_NfsClientV3_symlink, 0);
+    rb_define_method(rb_cSigarNfsClientV3, "mknod", rb_sigar_NfsClientV3_mknod, 0);
+    rb_define_method(rb_cSigarNfsClientV3, "remove", rb_sigar_NfsClientV3_remove, 0);
+    rb_define_method(rb_cSigarNfsClientV3, "rmdir", rb_sigar_NfsClientV3_rmdir, 0);
+    rb_define_method(rb_cSigarNfsClientV3, "rename", rb_sigar_NfsClientV3_rename, 0);
+    rb_define_method(rb_cSigarNfsClientV3, "link", rb_sigar_NfsClientV3_link, 0);
+    rb_define_method(rb_cSigarNfsClientV3, "readdir", rb_sigar_NfsClientV3_readdir, 0);
+    rb_define_method(rb_cSigarNfsClientV3, "readdirplus", rb_sigar_NfsClientV3_readdirplus, 0);
+    rb_define_method(rb_cSigarNfsClientV3, "fsstat", rb_sigar_NfsClientV3_fsstat, 0);
+    rb_define_method(rb_cSigarNfsClientV3, "fsinfo", rb_sigar_NfsClientV3_fsinfo, 0);
+    rb_define_method(rb_cSigarNfsClientV3, "pathconf", rb_sigar_NfsClientV3_pathconf, 0);
+    rb_define_method(rb_cSigarNfsClientV3, "commit", rb_sigar_NfsClientV3_commit, 0);
+    rb_cSigarNfsServerV2 = rb_define_class_under(rclass, "NfsServerV2", rb_cObject);
+    rb_define_method(rb_cSigarNfsServerV2, "null", rb_sigar_NfsServerV2_null, 0);
+    rb_define_method(rb_cSigarNfsServerV2, "getattr", rb_sigar_NfsServerV2_getattr, 0);
+    rb_define_method(rb_cSigarNfsServerV2, "setattr", rb_sigar_NfsServerV2_setattr, 0);
+    rb_define_method(rb_cSigarNfsServerV2, "root", rb_sigar_NfsServerV2_root, 0);
+    rb_define_method(rb_cSigarNfsServerV2, "lookup", rb_sigar_NfsServerV2_lookup, 0);
+    rb_define_method(rb_cSigarNfsServerV2, "readlink", rb_sigar_NfsServerV2_readlink, 0);
+    rb_define_method(rb_cSigarNfsServerV2, "read", rb_sigar_NfsServerV2_read, 0);
+    rb_define_method(rb_cSigarNfsServerV2, "writecache", rb_sigar_NfsServerV2_writecache, 0);
+    rb_define_method(rb_cSigarNfsServerV2, "write", rb_sigar_NfsServerV2_write, 0);
+    rb_define_method(rb_cSigarNfsServerV2, "create", rb_sigar_NfsServerV2_create, 0);
+    rb_define_method(rb_cSigarNfsServerV2, "remove", rb_sigar_NfsServerV2_remove, 0);
+    rb_define_method(rb_cSigarNfsServerV2, "rename", rb_sigar_NfsServerV2_rename, 0);
+    rb_define_method(rb_cSigarNfsServerV2, "link", rb_sigar_NfsServerV2_link, 0);
+    rb_define_method(rb_cSigarNfsServerV2, "symlink", rb_sigar_NfsServerV2_symlink, 0);
+    rb_define_method(rb_cSigarNfsServerV2, "mkdir", rb_sigar_NfsServerV2_mkdir, 0);
+    rb_define_method(rb_cSigarNfsServerV2, "rmdir", rb_sigar_NfsServerV2_rmdir, 0);
+    rb_define_method(rb_cSigarNfsServerV2, "readdir", rb_sigar_NfsServerV2_readdir, 0);
+    rb_define_method(rb_cSigarNfsServerV2, "fsstat", rb_sigar_NfsServerV2_fsstat, 0);
+    rb_cSigarNfsServerV3 = rb_define_class_under(rclass, "NfsServerV3", rb_cObject);
+    rb_define_method(rb_cSigarNfsServerV3, "null", rb_sigar_NfsServerV3_null, 0);
+    rb_define_method(rb_cSigarNfsServerV3, "getattr", rb_sigar_NfsServerV3_getattr, 0);
+    rb_define_method(rb_cSigarNfsServerV3, "setattr", rb_sigar_NfsServerV3_setattr, 0);
+    rb_define_method(rb_cSigarNfsServerV3, "lookup", rb_sigar_NfsServerV3_lookup, 0);
+    rb_define_method(rb_cSigarNfsServerV3, "access", rb_sigar_NfsServerV3_access, 0);
+    rb_define_method(rb_cSigarNfsServerV3, "readlink", rb_sigar_NfsServerV3_readlink, 0);
+    rb_define_method(rb_cSigarNfsServerV3, "read", rb_sigar_NfsServerV3_read, 0);
+    rb_define_method(rb_cSigarNfsServerV3, "write", rb_sigar_NfsServerV3_write, 0);
+    rb_define_method(rb_cSigarNfsServerV3, "create", rb_sigar_NfsServerV3_create, 0);
+    rb_define_method(rb_cSigarNfsServerV3, "mkdir", rb_sigar_NfsServerV3_mkdir, 0);
+    rb_define_method(rb_cSigarNfsServerV3, "symlink", rb_sigar_NfsServerV3_symlink, 0);
+    rb_define_method(rb_cSigarNfsServerV3, "mknod", rb_sigar_NfsServerV3_mknod, 0);
+    rb_define_method(rb_cSigarNfsServerV3, "remove", rb_sigar_NfsServerV3_remove, 0);
+    rb_define_method(rb_cSigarNfsServerV3, "rmdir", rb_sigar_NfsServerV3_rmdir, 0);
+    rb_define_method(rb_cSigarNfsServerV3, "rename", rb_sigar_NfsServerV3_rename, 0);
+    rb_define_method(rb_cSigarNfsServerV3, "link", rb_sigar_NfsServerV3_link, 0);
+    rb_define_method(rb_cSigarNfsServerV3, "readdir", rb_sigar_NfsServerV3_readdir, 0);
+    rb_define_method(rb_cSigarNfsServerV3, "readdirplus", rb_sigar_NfsServerV3_readdirplus, 0);
+    rb_define_method(rb_cSigarNfsServerV3, "fsstat", rb_sigar_NfsServerV3_fsstat, 0);
+    rb_define_method(rb_cSigarNfsServerV3, "fsinfo", rb_sigar_NfsServerV3_fsinfo, 0);
+    rb_define_method(rb_cSigarNfsServerV3, "pathconf", rb_sigar_NfsServerV3_pathconf, 0);
+    rb_define_method(rb_cSigarNfsServerV3, "commit", rb_sigar_NfsServerV3_commit, 0);
+    rb_cSigarProcCpu = rb_define_class_under(rclass, "ProcCpu", rb_cObject);
+    rb_define_method(rb_cSigarProcCpu, "percent", rb_sigar_ProcCpu_percent, 0);
+    rb_define_method(rb_cSigarProcCpu, "last_time", rb_sigar_ProcCpu_last_time, 0);
+    rb_define_method(rb_cSigarProcCpu, "start_time", rb_sigar_ProcCpu_start_time, 0);
+    rb_define_method(rb_cSigarProcCpu, "user", rb_sigar_ProcCpu_user, 0);
+    rb_define_method(rb_cSigarProcCpu, "sys", rb_sigar_ProcCpu_sys, 0);
+    rb_define_method(rb_cSigarProcCpu, "total", rb_sigar_ProcCpu_total, 0);
+    rb_cSigarProcCred = rb_define_class_under(rclass, "ProcCred", rb_cObject);
+    rb_define_method(rb_cSigarProcCred, "uid", rb_sigar_ProcCred_uid, 0);
+    rb_define_method(rb_cSigarProcCred, "gid", rb_sigar_ProcCred_gid, 0);
+    rb_define_method(rb_cSigarProcCred, "euid", rb_sigar_ProcCred_euid, 0);
+    rb_define_method(rb_cSigarProcCred, "egid", rb_sigar_ProcCred_egid, 0);
+    rb_cSigarProcCredName = rb_define_class_under(rclass, "ProcCredName", rb_cObject);
+    rb_define_method(rb_cSigarProcCredName, "user", rb_sigar_ProcCredName_user, 0);
+    rb_define_method(rb_cSigarProcCredName, "group", rb_sigar_ProcCredName_group, 0);
+    rb_cSigarProcCumulativeDiskIO = rb_define_class_under(rclass, "ProcCumulativeDiskIO", rb_cObject);
+    rb_define_method(rb_cSigarProcCumulativeDiskIO, "bytes_read", rb_sigar_ProcCumulativeDiskIO_bytes_read, 0);
+    rb_define_method(rb_cSigarProcCumulativeDiskIO, "bytes_written", rb_sigar_ProcCumulativeDiskIO_bytes_written, 0);
+    rb_define_method(rb_cSigarProcCumulativeDiskIO, "bytes_total", rb_sigar_ProcCumulativeDiskIO_bytes_total, 0);
+    rb_cSigarProcDiskIO = rb_define_class_under(rclass, "ProcDiskIO", rb_cObject);
+    rb_define_method(rb_cSigarProcDiskIO, "bytes_read", rb_sigar_ProcDiskIO_bytes_read, 0);
+    rb_define_method(rb_cSigarProcDiskIO, "bytes_written", rb_sigar_ProcDiskIO_bytes_written, 0);
+    rb_define_method(rb_cSigarProcDiskIO, "bytes_total", rb_sigar_ProcDiskIO_bytes_total, 0);
+    rb_cSigarProcExe = rb_define_class_under(rclass, "ProcExe", rb_cObject);
+    rb_define_method(rb_cSigarProcExe, "name", rb_sigar_ProcExe_name, 0);
+    rb_define_method(rb_cSigarProcExe, "cwd", rb_sigar_ProcExe_cwd, 0);
+    rb_cSigarProcFd = rb_define_class_under(rclass, "ProcFd", rb_cObject);
+    rb_define_method(rb_cSigarProcFd, "total", rb_sigar_ProcFd_total, 0);
+    rb_cSigarProcMem = rb_define_class_under(rclass, "ProcMem", rb_cObject);
+    rb_define_method(rb_cSigarProcMem, "size", rb_sigar_ProcMem_size, 0);
+    rb_define_method(rb_cSigarProcMem, "resident", rb_sigar_ProcMem_resident, 0);
+    rb_define_method(rb_cSigarProcMem, "share", rb_sigar_ProcMem_share, 0);
+    rb_define_method(rb_cSigarProcMem, "minor_faults", rb_sigar_ProcMem_minor_faults, 0);
+    rb_define_method(rb_cSigarProcMem, "major_faults", rb_sigar_ProcMem_major_faults, 0);
+    rb_define_method(rb_cSigarProcMem, "page_faults", rb_sigar_ProcMem_page_faults, 0);
+    rb_cSigarProcStat = rb_define_class_under(rclass, "ProcStat", rb_cObject);
+    rb_define_method(rb_cSigarProcStat, "total", rb_sigar_ProcStat_total, 0);
+    rb_define_method(rb_cSigarProcStat, "idle", rb_sigar_ProcStat_idle, 0);
+    rb_define_method(rb_cSigarProcStat, "running", rb_sigar_ProcStat_running, 0);
+    rb_define_method(rb_cSigarProcStat, "sleeping", rb_sigar_ProcStat_sleeping, 0);
+    rb_define_method(rb_cSigarProcStat, "stopped", rb_sigar_ProcStat_stopped, 0);
+    rb_define_method(rb_cSigarProcStat, "zombie", rb_sigar_ProcStat_zombie, 0);
+    rb_define_method(rb_cSigarProcStat, "threads", rb_sigar_ProcStat_threads, 0);
+    rb_cSigarProcState = rb_define_class_under(rclass, "ProcState", rb_cObject);
+    rb_define_method(rb_cSigarProcState, "state", rb_sigar_ProcState_state, 0);
+    rb_define_method(rb_cSigarProcState, "name", rb_sigar_ProcState_name, 0);
+    rb_define_method(rb_cSigarProcState, "ppid", rb_sigar_ProcState_ppid, 0);
+    rb_define_method(rb_cSigarProcState, "tty", rb_sigar_ProcState_tty, 0);
+    rb_define_method(rb_cSigarProcState, "nice", rb_sigar_ProcState_nice, 0);
+    rb_define_method(rb_cSigarProcState, "priority", rb_sigar_ProcState_priority, 0);
+    rb_define_method(rb_cSigarProcState, "threads", rb_sigar_ProcState_threads, 0);
+    rb_define_method(rb_cSigarProcState, "processor", rb_sigar_ProcState_processor, 0);
+    rb_cSigarProcTime = rb_define_class_under(rclass, "ProcTime", rb_cObject);
+    rb_define_method(rb_cSigarProcTime, "start_time", rb_sigar_ProcTime_start_time, 0);
+    rb_define_method(rb_cSigarProcTime, "user", rb_sigar_ProcTime_user, 0);
+    rb_define_method(rb_cSigarProcTime, "sys", rb_sigar_ProcTime_sys, 0);
+    rb_define_method(rb_cSigarProcTime, "total", rb_sigar_ProcTime_total, 0);
+    rb_cSigarResourceLimit = rb_define_class_under(rclass, "ResourceLimit", rb_cObject);
+    rb_define_method(rb_cSigarResourceLimit, "cpu_cur", rb_sigar_ResourceLimit_cpu_cur, 0);
+    rb_define_method(rb_cSigarResourceLimit, "cpu_max", rb_sigar_ResourceLimit_cpu_max, 0);
+    rb_define_method(rb_cSigarResourceLimit, "file_size_cur", rb_sigar_ResourceLimit_file_size_cur, 0);
+    rb_define_method(rb_cSigarResourceLimit, "file_size_max", rb_sigar_ResourceLimit_file_size_max, 0);
+    rb_define_method(rb_cSigarResourceLimit, "pipe_size_max", rb_sigar_ResourceLimit_pipe_size_max, 0);
+    rb_define_method(rb_cSigarResourceLimit, "pipe_size_cur", rb_sigar_ResourceLimit_pipe_size_cur, 0);
+    rb_define_method(rb_cSigarResourceLimit, "data_cur", rb_sigar_ResourceLimit_data_cur, 0);
+    rb_define_method(rb_cSigarResourceLimit, "data_max", rb_sigar_ResourceLimit_data_max, 0);
+    rb_define_method(rb_cSigarResourceLimit, "stack_cur", rb_sigar_ResourceLimit_stack_cur, 0);
+    rb_define_method(rb_cSigarResourceLimit, "stack_max", rb_sigar_ResourceLimit_stack_max, 0);
+    rb_define_method(rb_cSigarResourceLimit, "core_cur", rb_sigar_ResourceLimit_core_cur, 0);
+    rb_define_method(rb_cSigarResourceLimit, "core_max", rb_sigar_ResourceLimit_core_max, 0);
+    rb_define_method(rb_cSigarResourceLimit, "memory_cur", rb_sigar_ResourceLimit_memory_cur, 0);
+    rb_define_method(rb_cSigarResourceLimit, "memory_max", rb_sigar_ResourceLimit_memory_max, 0);
+    rb_define_method(rb_cSigarResourceLimit, "processes_cur", rb_sigar_ResourceLimit_processes_cur, 0);
+    rb_define_method(rb_cSigarResourceLimit, "processes_max", rb_sigar_ResourceLimit_processes_max, 0);
+    rb_define_method(rb_cSigarResourceLimit, "open_files_cur", rb_sigar_ResourceLimit_open_files_cur, 0);
+    rb_define_method(rb_cSigarResourceLimit, "open_files_max", rb_sigar_ResourceLimit_open_files_max, 0);
+    rb_define_method(rb_cSigarResourceLimit, "virtual_memory_cur", rb_sigar_ResourceLimit_virtual_memory_cur, 0);
+    rb_define_method(rb_cSigarResourceLimit, "virtual_memory_max", rb_sigar_ResourceLimit_virtual_memory_max, 0);
+    rb_cSigarSwap = rb_define_class_under(rclass, "Swap", rb_cObject);
+    rb_define_method(rb_cSigarSwap, "total", rb_sigar_Swap_total, 0);
+    rb_define_method(rb_cSigarSwap, "used", rb_sigar_Swap_used, 0);
+    rb_define_method(rb_cSigarSwap, "free", rb_sigar_Swap_free, 0);
+    rb_define_method(rb_cSigarSwap, "page_in", rb_sigar_Swap_page_in, 0);
+    rb_define_method(rb_cSigarSwap, "page_out", rb_sigar_Swap_page_out, 0);
+    rb_cSigarSysInfo = rb_define_class_under(rclass, "SysInfo", rb_cObject);
+    rb_define_method(rb_cSigarSysInfo, "name", rb_sigar_SysInfo_name, 0);
+    rb_define_method(rb_cSigarSysInfo, "version", rb_sigar_SysInfo_version, 0);
+    rb_define_method(rb_cSigarSysInfo, "arch", rb_sigar_SysInfo_arch, 0);
+    rb_define_method(rb_cSigarSysInfo, "machine", rb_sigar_SysInfo_machine, 0);
+    rb_define_method(rb_cSigarSysInfo, "description", rb_sigar_SysInfo_description, 0);
+    rb_define_method(rb_cSigarSysInfo, "patch_level", rb_sigar_SysInfo_patch_level, 0);
+    rb_define_method(rb_cSigarSysInfo, "vendor", rb_sigar_SysInfo_vendor, 0);
+    rb_define_method(rb_cSigarSysInfo, "vendor_version", rb_sigar_SysInfo_vendor_version, 0);
+    rb_define_method(rb_cSigarSysInfo, "vendor_name", rb_sigar_SysInfo_vendor_name, 0);
+    rb_define_method(rb_cSigarSysInfo, "vendor_code_name", rb_sigar_SysInfo_vendor_code_name, 0);
+    rb_cSigarTcp = rb_define_class_under(rclass, "Tcp", rb_cObject);
+    rb_define_method(rb_cSigarTcp, "active_opens", rb_sigar_Tcp_active_opens, 0);
+    rb_define_method(rb_cSigarTcp, "passive_opens", rb_sigar_Tcp_passive_opens, 0);
+    rb_define_method(rb_cSigarTcp, "attempt_fails", rb_sigar_Tcp_attempt_fails, 0);
+    rb_define_method(rb_cSigarTcp, "estab_resets", rb_sigar_Tcp_estab_resets, 0);
+    rb_define_method(rb_cSigarTcp, "curr_estab", rb_sigar_Tcp_curr_estab, 0);
+    rb_define_method(rb_cSigarTcp, "in_segs", rb_sigar_Tcp_in_segs, 0);
+    rb_define_method(rb_cSigarTcp, "out_segs", rb_sigar_Tcp_out_segs, 0);
+    rb_define_method(rb_cSigarTcp, "retrans_segs", rb_sigar_Tcp_retrans_segs, 0);
+    rb_define_method(rb_cSigarTcp, "in_errs", rb_sigar_Tcp_in_errs, 0);
+    rb_define_method(rb_cSigarTcp, "out_rsts", rb_sigar_Tcp_out_rsts, 0);
+    rb_cSigarThreadCpu = rb_define_class_under(rclass, "ThreadCpu", rb_cObject);
+    rb_define_method(rb_cSigarThreadCpu, "user", rb_sigar_ThreadCpu_user, 0);
+    rb_define_method(rb_cSigarThreadCpu, "sys", rb_sigar_ThreadCpu_sys, 0);
+    rb_define_method(rb_cSigarThreadCpu, "total", rb_sigar_ThreadCpu_total, 0);
+    rb_cSigarUptime = rb_define_class_under(rclass, "Uptime", rb_cObject);
+    rb_define_method(rb_cSigarUptime, "uptime", rb_sigar_Uptime_uptime, 0);
+    rb_cSigarWho = rb_define_class_under(rclass, "Who", rb_cObject);
+    rb_define_method(rb_cSigarWho, "user", rb_sigar_Who_user, 0);
+    rb_define_method(rb_cSigarWho, "device", rb_sigar_Who_device, 0);
+    rb_define_method(rb_cSigarWho, "host", rb_sigar_Who_host, 0);
+    rb_define_method(rb_cSigarWho, "time", rb_sigar_Who_time, 0);
+}

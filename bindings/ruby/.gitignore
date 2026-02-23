@@ -1,5 +1,4 @@
 Makefile
-rbsigar_generated.rx
 mkmf.log
 *.o
 *.so
@@ -10,14 +9,9 @@ mkmf.log
 *.exp
 *.lib
 *.pdb
-*.
+*.dSYM/
 *_sigar.c
 sigar.c
 sigar_*.c
-get_mib2.c
-kstats.c
-procfs.c
-peb.c
-dlpi.c
 *.cpp
 rbsigar.so.manifest

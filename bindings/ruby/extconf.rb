@@ -34,99 +34,64 @@ when /darwin/
 when /bsd/
   os = 'darwin'
   have_library("kvm")
-when /mswin|mingw|cygwin|bccwin/
-  os = 'win32'
-  require 'ftools'
-  $CPPFLAGS += ' -DWIN32'
-  is_win32 = true
-  have_library("kernel32")
-  have_library("user32")
-  have_library("advapi32")
-  have_library("ws2_32")
-  have_library("netapi32")
-  have_library("shell32")
-  have_library("pdh")
-  have_library("version")
 when /linux/
   os = 'linux'
   if have_header("sys/sysmacros.h")
     $CPPFLAGS += ' -DLINUX_SYSMACROS'
   end
-when /solaris|sun/
-  os = 'solaris'
-  have_library("nsl")
-  have_library("socket")
-  have_library("kstat")
-when /hpux/
-  os = 'hpux'
-  #XXX have_libary no workie on hpux?
-  $LDFLAGS += ' -lnsl -lnm'
-when /aix/
-  os = 'aix'
-  have_library("odm")
-  have_library("cfg")
-  have_library("perfstat")
 else
-  os = RUBY_PLATFORM
+  raise "Unsupported platform: #{RUBY_PLATFORM}"
 end
 
 osdir = "../../src/os/#{os}"
 $CPPFLAGS += ' -I../../include' + ' -I' + osdir
-$CPPFLAGS += ' -U_FILE_OFFSET_BITS' unless is_win32
-$CPPFLAGS += ' -fgnu89-inline'
+$CPPFLAGS += ' -U_FILE_OFFSET_BITS'
 
-if RUBY_VERSION > '1.8.4'
-  $CPPFLAGS += ' -DRB_HAS_RE_ERROR'
+if File.exist?('Makefile')
+  cmd = 'make distclean'
+  print cmd + "\n"
+  system(cmd)
 end
-if RUBY_VERSION >= '1.9.0'
-  $CPPFLAGS += ' -DRB_RUBY_19'
-end
-
-#incase of nfs shared dir...
-unless is_win32
-  if File.exist?('Makefile')
-    cmd = 'make distclean'
-    print cmd + "\n"
-    system(cmd)
-  end
-  Dir["./*.c"].each do |file|
-    if File.lstat(file).symlink?
-      print "unlink #{file}\n"
-      File.delete(file)
-    end
+Dir["./*.c"].each do |file|
+  if File.lstat(file).symlink?
+    print "unlink #{file}\n"
+    File.delete(file)
   end
 end
 
-$distcleanfiles = ['rbsigar_generated.rx','sigar_version.c']
+$distcleanfiles = ['sigar_version.c']
 
-system('perl -Mlib=.. -MSigarWrapper -e generate Ruby .')
+# Generate sigar_version.c from template
 libname = extension_name + '.' + CONFIG['DLEXT']
-filters =
-  'ARCHNAME=' + RUBY_PLATFORM + ' ' +
-  'ARCHLIB=' + libname + ' ' +
-  'BINNAME=' + libname
-
-system('perl -Mlib=.. -MSigarBuild -e version_file ' + filters)
-
-if is_win32
-  system('perl -Mlib=.. -MSigarBuild -e resource_file ' + filters)
-  system('rc /r sigar.rc')
-  $LDFLAGS += ' sigar.res'
-  $distcleanfiles << ['sigar.rc', 'sigar.res']
-  #do not want dynamic runtime else "MSVCR80.dll was not found"
-  $CFLAGS = $CFLAGS.gsub('-MD', '')
+props = {}
+File.foreach("../../version.properties") do |line|
+  next if line =~ /^#/ || line.strip.empty?
+  key, val = line.strip.split('=', 2)
+  props[key] = val
 end
+scm_revision = `git -C ../.. rev-parse --short HEAD 2>/dev/null`.strip
+scm_revision = "unknown" if scm_revision.empty?
+build_date = Time.now.strftime("%m/%d/%Y %I:%M %p")
+version_string = "#{props['version.major']}.#{props['version.minor']}.#{props['version.maint']}.#{props['version.build']}"
 
-#XXX seems mkmf forces basename on srcs
-#XXX should be linking against libsigar anyhow
+template = File.read("../../src/sigar_version.c.in")
+version_c = template
+  .gsub("@@BUILD_DATE@@", build_date)
+  .gsub("@@SCM_REVISION@@", scm_revision)
+  .gsub("@@VERSION_STRING@@", version_string)
+  .gsub("@@ARCHNAME@@", RUBY_PLATFORM)
+  .gsub("@@ARCHLIB@@", libname)
+  .gsub("@@BINNAME@@", libname)
+  .gsub("@@VERSION_MAJOR@@", props['version.major'])
+  .gsub("@@VERSION_MINOR@@", props['version.minor'])
+  .gsub("@@VERSION_MAINT@@", props['version.maint'])
+  .gsub("@@VERSION_BUILD@@", props['version.build'])
+File.write("sigar_version.c", version_c)
+
 (Dir["../../src/*.c"] + Dir["#{osdir}/*.c"] + Dir["#{osdir}/*.cpp"]).each do |file|
   cf = File.basename(file)
   print file + ' -> ' + cf + "\n"
-  if is_win32
-    File.copy(file, cf)
-  else
-    File.symlink(file, cf) unless File.file?(cf)
-  end
+  File.symlink(file, cf) unless File.file?(cf)
   $distcleanfiles.push(cf)
 end
 

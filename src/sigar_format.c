@@ -93,7 +93,7 @@ int sigar_group_name_get(sigar_t *sigar, int gid, char *buf, int buflen)
          * results in uid == -1 and gr == NULL.
          * wtf getgrgid_r doesnt fail instead? 
          */
-        sprintf(buf, "%d", gid);
+        snprintf(buf, buflen, "%d", gid);
     }
     buf[buflen-1] = '\0';
 
@@ -227,7 +227,7 @@ SIGAR_DECLARE(char *) sigar_format_size(sigar_uint64_t size, char *buf)
     }
 
     if (size < 973) {
-        sprintf(buf, "%3d ", (int) size);
+        snprintf(buf, 56, "%3d ", (int) size);
         return buf;
     }
 
@@ -245,7 +245,7 @@ SIGAR_DECLARE(char *) sigar_format_size(sigar_uint64_t size, char *buf)
                 ++size;
                 remain = 0;
             }
-            sprintf(buf, "%d.%d%c", (int) size, remain, *o);
+            snprintf(buf, 56, "%d.%d%c", (int) size, remain, *o);
             return buf;
         }
 
@@ -253,7 +253,7 @@ SIGAR_DECLARE(char *) sigar_format_size(sigar_uint64_t size, char *buf)
             ++size;
         }
 
-        sprintf(buf, "%3d%c", (int) size, *o);
+        snprintf(buf, 56, "%3d%c", (int) size, *o);
 
         return buf;
     } while (1);
@@ -269,12 +269,11 @@ SIGAR_DECLARE(int) sigar_uptime_string(sigar_t *sigar,
     int time = (int)uptime->uptime;
     int minutes, hours, days, offset = 0;
 
-    /* XXX: get rid of sprintf and/or check for overflow */
     days = time / (60*60*24);
 
     if (days) {
-        offset += sprintf(ptr + offset, "%d day%s, ",
-                          days, (days > 1) ? "s" : "");
+        offset += snprintf(ptr + offset, buflen - offset, "%d day%s, ",
+                           days, (days > 1) ? "s" : "");
     }
 
     minutes = time / 60;
@@ -283,11 +282,11 @@ SIGAR_DECLARE(int) sigar_uptime_string(sigar_t *sigar,
     minutes = minutes % 60;
 
     if (hours) {
-        offset += sprintf(ptr + offset, "%2d:%02d",
-                          hours, minutes);
+        offset += snprintf(ptr + offset, buflen - offset, "%2d:%02d",
+                           hours, minutes);
     }
     else {
-        offset += sprintf(ptr + offset, "%d min", minutes);
+        offset += snprintf(ptr + offset, buflen - offset, "%d min", minutes);
     }
 
     return SIGAR_OK;
@@ -327,9 +326,9 @@ int sigar_inet_ntoa(sigar_t *sigar,
 
 static int sigar_ether_ntoa(char *buff, unsigned char *ptr)
 {
-    sprintf(buff, "%02X:%02X:%02X:%02X:%02X:%02X",
-            (ptr[0] & 0xff), (ptr[1] & 0xff), (ptr[2] & 0xff),
-            (ptr[3] & 0xff), (ptr[4] & 0xff), (ptr[5] & 0xff));
+    snprintf(buff, 18, "%02X:%02X:%02X:%02X:%02X:%02X",
+             (ptr[0] & 0xff), (ptr[1] & 0xff), (ptr[2] & 0xff),
+             (ptr[3] & 0xff), (ptr[4] & 0xff), (ptr[5] & 0xff));
     return SIGAR_OK;
 }
 
@@ -513,58 +512,65 @@ SIGAR_DECLARE(const char *)sigar_net_connection_state_get(int state)
     }
 }
 
+/* caller provides 1024-byte buffer */
+#define FLAGS_BUFLEN 1024
+#define FLAGS_APPEND(s) strncat(buf, s, FLAGS_BUFLEN - strlen(buf) - 1)
+
 SIGAR_DECLARE(char *) sigar_net_interface_flags_to_string(sigar_uint64_t flags, char *buf)
 {
     *buf = '\0';
 
     if (flags == 0) {
-        strcat(buf, "[NO FLAGS] ");
+        FLAGS_APPEND("[NO FLAGS] ");
     }
     if (flags & SIGAR_IFF_UP) {
-        strcat(buf, "UP ");
+        FLAGS_APPEND("UP ");
     }
     if (flags & SIGAR_IFF_BROADCAST) {
-        strcat(buf, "BROADCAST ");
+        FLAGS_APPEND("BROADCAST ");
     }
     if (flags & SIGAR_IFF_DEBUG) {
-        strcat(buf, "DEBUG ");
+        FLAGS_APPEND("DEBUG ");
     }
     if (flags & SIGAR_IFF_LOOPBACK) {
-        strcat(buf, "LOOPBACK ");
+        FLAGS_APPEND("LOOPBACK ");
     }
     if (flags & SIGAR_IFF_POINTOPOINT) {
-        strcat(buf, "POINTOPOINT ");
+        FLAGS_APPEND("POINTOPOINT ");
     }
     if (flags & SIGAR_IFF_NOTRAILERS) {
-        strcat(buf, "NOTRAILERS ");
+        FLAGS_APPEND("NOTRAILERS ");
     }
     if (flags & SIGAR_IFF_RUNNING) {
-        strcat(buf, "RUNNING ");
+        FLAGS_APPEND("RUNNING ");
     }
     if (flags & SIGAR_IFF_NOARP) {
-        strcat(buf, "NOARP ");
+        FLAGS_APPEND("NOARP ");
     }
     if (flags & SIGAR_IFF_PROMISC) {
-        strcat(buf, "PROMISC ");
+        FLAGS_APPEND("PROMISC ");
     }
     if (flags & SIGAR_IFF_ALLMULTI) {
-        strcat(buf, "ALLMULTI ");
+        FLAGS_APPEND("ALLMULTI ");
     }
     if (flags & SIGAR_IFF_MULTICAST) {
-        strcat(buf, "MULTICAST ");
+        FLAGS_APPEND("MULTICAST ");
     }
     if (flags & SIGAR_IFF_SLAVE) {
-        strcat(buf, "SLAVE ");
+        FLAGS_APPEND("SLAVE ");
     }
     if (flags & SIGAR_IFF_MASTER) {
-        strcat(buf, "MASTER ");
+        FLAGS_APPEND("MASTER ");
     }
     if (flags & SIGAR_IFF_DYNAMIC) {
-        strcat(buf, "DYNAMIC ");
+        FLAGS_APPEND("DYNAMIC ");
     }
 
     return buf;
 }
+
+#undef FLAGS_APPEND
+#undef FLAGS_BUFLEN
 
 #ifdef WIN32
 #define NET_SERVICES_FILE "C:\\windows\\system32\\drivers\\etc\\services"
