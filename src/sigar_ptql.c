@@ -28,14 +28,7 @@
 #include "pcre.h"
 #endif
 
-/* See http://gcc.gnu.org/ml/libstdc++/2002-03/msg00164.html */
-#if defined(WIN32) || (defined(__hpux) && defined(SIGAR_64BIT))
-#define strtoull strtoul
-#elif (defined(__hpux) && !defined(SIGAR_64BIT))
-#define strtoull __strtoull
-#else
 #include <errno.h>
-#endif
 
 #define SIGAR_CLEAR_ERRNO() errno = 0
 
@@ -45,12 +38,7 @@
 typedef struct ptql_parse_branch_t ptql_parse_branch_t;
 typedef struct ptql_branch_t ptql_branch_t;
 
-/* adhere to calling convention, else risk stack corruption */
-#ifdef WIN32
-#define SIGAPI WINAPI
-#else
 #define SIGAPI
-#endif
 
 typedef int (SIGAPI *ptql_get_t)(sigar_t *sigar, sigar_pid_t pid, void *data);
 typedef int (*ptql_branch_init_t)(ptql_parse_branch_t *parsed, ptql_branch_t *branch,
@@ -563,10 +551,6 @@ static int ptql_branch_list_destroy(ptql_branch_list_t *branches)
     return SIGAR_OK;
 }
 
-#ifdef WIN32
-#define vsnprintf _vsnprintf
-#endif
-
 #define PTQL_ERRNAN \
     ptql_error(error, "Query value '%s' is not a number", parsed->value)
 
@@ -704,7 +688,6 @@ enum {
 
 #endif
 
-#ifndef WIN32
 #include <sys/stat.h>
 int sigar_sudo_file2str(const char *fname, char *buffer, int buflen)
 {
@@ -726,7 +709,6 @@ int sigar_sudo_file2str(const char *fname, char *buffer, int buflen)
 
     return SIGAR_OK;
 }
-#endif
 
 static int ptql_branch_init_service(ptql_parse_branch_t *parsed,
                                     ptql_branch_t *branch,
@@ -755,10 +737,6 @@ static int ptql_branch_init_service(ptql_parse_branch_t *parsed,
                           parsed->name, parsed->attr);
     }
 
-#ifdef WIN32
-    branch->data.str = sigar_strdup(parsed->value);
-    branch->data_size = strlen(parsed->value);
-#endif
     return SIGAR_OK;
 }
 
@@ -797,178 +775,6 @@ static int ptql_branch_init_pid(ptql_parse_branch_t *parsed,
                       parsed->name, parsed->attr);
 }
 
-#ifdef WIN32
-#define QUERY_SC_SIZE 8192
-
-static int ptql_service_query_config(SC_HANDLE scm_handle,
-                                     char *name,
-                                     LPQUERY_SERVICE_CONFIG config)
-{
-    int status;
-    DWORD bytes;
-    SC_HANDLE handle =
-        OpenService(scm_handle, name, SERVICE_QUERY_CONFIG);
-
-    if (!handle) {
-        return GetLastError();
-    }
-
-    if (QueryServiceConfig(handle, config, QUERY_SC_SIZE, &bytes)) {
-        status = SIGAR_OK;
-    }
-    else {
-        status = GetLastError();
-    }
-
-    CloseServiceHandle(handle);
-    return status;
-}
-
-static int sigar_services_walk(sigar_services_walker_t *walker,
-                               ptql_branch_t *branch)
-{
-    sigar_services_status_t ss;
-    char buffer[QUERY_SC_SIZE];
-    char exe[SIGAR_CMDLINE_MAX];
-    LPQUERY_SERVICE_CONFIG config = (LPQUERY_SERVICE_CONFIG)buffer;
-    DWORD i, status;
-
-    SIGAR_ZERO(&ss);
-    status = sigar_services_status_get(&ss, walker->flags);
-    if (status != SIGAR_OK) {
-        return status;
-    }
-    for (i=0; i<ss.count; i++) {
-        sigar_pid_t service_pid = 0;
-        int status;
-        char *value = NULL;
-        char *name = ss.services[i].lpServiceName;
-
-        if (branch == NULL) {
-            /* no query, return all */
-            if (walker->add_service(walker, name) != SIGAR_OK) {
-                break;
-            }
-            continue;
-        }
-
-        switch (branch->flags) {
-          case PTQL_PID_SERVICE_DISPLAY:
-            value = ss.services[i].lpDisplayName;
-            break;
-          case PTQL_PID_SERVICE_PATH:
-          case PTQL_PID_SERVICE_EXE:
-            status = ptql_service_query_config(ss.handle, name, config);
-            if (status == SIGAR_OK) {
-                if (branch->flags == PTQL_PID_SERVICE_EXE) {
-                    value =
-                        sigar_service_exe_get(config->lpBinaryPathName,
-                                              exe, 1);
-                }
-                else {
-                    value = config->lpBinaryPathName;
-                }
-            }
-            else {
-                continue;
-            }
-            break;
-          case PTQL_PID_SERVICE_PID:
-            sigar_service_pid_get(walker->sigar,
-                                  name,
-                                  &service_pid);
-            break;
-          case PTQL_PID_SERVICE_NAME:
-          default:
-            value = name;
-            break;
-        }
-
-        if ((value && ptql_str_match(walker->sigar, branch, value)) ||
-            (service_pid &&
-             pid_branch_match(branch, service_pid, atoi(branch->data.str))))
-        {
-            if (walker->add_service(walker, name) != SIGAR_OK) {
-                break;
-            }
-        }
-    }
-
-    sigar_services_status_close(&ss);
-
-    return SIGAR_OK;
-}
-
-static int ptql_pid_service_add(sigar_services_walker_t *walker,
-                                char *name)
-{
-    sigar_pid_t service_pid;
-    sigar_proc_list_t *proclist =
-        (sigar_proc_list_t *)walker->data;
-    int status =
-        sigar_service_pid_get(walker->sigar,
-                              name,
-                              &service_pid);
-
-    if (status == SIGAR_OK) {
-        SIGAR_PROC_LIST_GROW(proclist);
-        proclist->data[proclist->number++] = service_pid;
-    }
-
-    return SIGAR_OK;
-}
-
-static int ptql_pid_service_list_get(sigar_t *sigar,
-                                     ptql_branch_t *branch,
-                                     sigar_proc_list_t *proclist)
-{
-    sigar_services_walker_t walker;
-    walker.sigar = sigar;
-    walker.flags = SERVICE_ACTIVE;
-    walker.data = proclist;
-    walker.add_service = ptql_pid_service_add;
-
-    return sigar_services_walk(&walker, branch);
-}
-
-int sigar_services_query(char *ptql,
-                         sigar_ptql_error_t *error,
-                         sigar_services_walker_t *walker)
-{
-    int status;
-    sigar_ptql_query_t *query;
-
-    if (ptql == NULL) {
-        return sigar_services_walk(walker, NULL);
-    }
-
-    status = sigar_ptql_query_create(&query, (char *)ptql, error);
-    if (status != SIGAR_OK) {
-        return status;
-    }
-
-    if (query->branches.number == 1) {
-        ptql_branch_t *branch = &query->branches.data[0];
-
-        if (IS_PID_SERVICE_QUERY(branch)) {
-            status = sigar_services_walk(walker, branch);
-        }
-        else {
-            ptql_error(error, "Invalid Service query: %s", ptql);
-            status = SIGAR_PTQL_MALFORMED_QUERY;
-        }
-    }
-    else {
-        ptql_error(error, "Too many queries (%d), must be (1)",
-                   query->branches.number);
-        status = SIGAR_PTQL_MALFORMED_QUERY;
-    }
-
-    sigar_ptql_query_destroy(query);
-
-    return status;
-}
-#endif
 
 static int ptql_pid_port_get(sigar_t *sigar,
                              ptql_branch_t *branch,
@@ -1002,11 +808,7 @@ static int ptql_pid_get(sigar_t *sigar,
             status = sigar_file2str(fname, buffer, len);
         }
         else {
-#ifdef WIN32
-            return SIGAR_ENOTIMPL;
-#else
             status = sigar_sudo_file2str(fname, buffer, len);
-#endif
         }
         if (status != SIGAR_OK) {
             return status;
@@ -1018,16 +820,7 @@ static int ptql_pid_get(sigar_t *sigar,
         }
     }
     else if (branch->flags == PTQL_PID_SERVICE_NAME) {
-#ifdef WIN32
-        int status =
-            sigar_service_pid_get(sigar,
-                                  branch->data.str, pid);
-        if (status != SIGAR_OK) {
-            return status;
-        }
-#else
         return SIGAR_ENOTIMPL;
-#endif
     }
     else if ((branch->flags == PTQL_PID_UDP_PORT) ||
              (branch->flags == PTQL_PID_TCP_PORT))
@@ -1055,11 +848,7 @@ static int ptql_pid_list_get(sigar_t *sigar,
         if ((branch->flags > PTQL_PID_SERVICE_NAME) ||
             (branch->op_name != PTQL_OP_EQ))
         {
-#ifdef WIN32
-            return ptql_pid_service_list_get(sigar, branch, proclist);
-#else
             return SIGAR_OK; /* no matches */
-#endif
         }
     }
 

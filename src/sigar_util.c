@@ -26,8 +26,6 @@
 #include "sigar_util.h"
 #include "sigar_os.h"
 
-#ifndef WIN32
-
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -288,8 +286,6 @@ int sigar_procfs_args_get(sigar_t *sigar, sigar_pid_t pid,
     return SIGAR_OK;
 }
 
-#endif /* WIN32 */
-
 /* from httpd/server/util.c */
 char *sigar_strcasestr(const char *s1, const char *s2)
 {
@@ -345,8 +341,6 @@ int sigar_mem_calc_ram(sigar_t *sigar, sigar_mem_t *mem)
 
     return ram;
 }
-
-#ifndef WIN32
 
 sigar_iodev_t *sigar_iodev_get(sigar_t *sigar,
                                const char *dirname)
@@ -459,15 +453,11 @@ sigar_iodev_t *sigar_iodev_get(sigar_t *sigar,
         return NULL;
     }
 }
-#endif
 
 double sigar_file_system_usage_calc_used(sigar_t *sigar,
                                          sigar_file_system_usage_t *fsusage)
 {
-    /* 
-     * win32 will not convert __uint64 to double.
-     * convert to KB then do unsigned long -> double.
-     */
+    /* convert to KB then do unsigned long -> double */
     sigar_uint64_t b_used = (fsusage->total - fsusage->free) / 1024;
     sigar_uint64_t b_avail = fsusage->avail / 1024;
     unsigned long utotal = b_used + b_avail;
@@ -490,7 +480,7 @@ typedef struct {
     sigar_uint32_t edx;
 } sigar_cpuid_t;
 
-#if defined(__GNUC__) && !defined(__sun)
+#if defined(__GNUC__)
 
 #  if defined(__i386__)
 #  define SIGAR_HAS_CPUID
@@ -523,34 +513,6 @@ static void sigar_cpuid(sigar_uint32_t request,
                   : "memory");
 }
 #  endif
-#elif defined(WIN32)
-#  ifdef _M_X64
-#  include <intrin.h>
-#  define SIGAR_HAS_CPUID
-static void sigar_cpuid(sigar_uint32_t request,
-                        sigar_cpuid_t *id)
-{
-    sigar_uint32_t info[4];
-    __cpuid(info, request); /* as of MSVC 7 */
-    memcpy(id, &info[0], sizeof(info));
-}
-#  else
-#  define SIGAR_HAS_CPUID
-static void sigar_cpuid(sigar_uint32_t request,
-                        sigar_cpuid_t *id)
-{
-    __asm {
-        mov edi, id
-        mov eax, [edi].eax
-        mov ecx, [edi].ecx
-        cpuid
-        mov [edi].eax, eax
-        mov [edi].ebx, ebx
-        mov [edi].ecx, ecx
-        mov [edi].edx, edx
-    }
-}
-#  endif
 #endif
 
 #define INTEL_ID 0x756e6547
@@ -579,8 +541,6 @@ int sigar_cpu_core_count(sigar_t *sigar)
     }
 
     return sigar->lcpu;
-#elif defined(__sun) || defined(__hpux) || defined(_AIX)
-    return 1;
 #else
     sigar->lcpu = 1;
     return sigar->lcpu;
@@ -656,7 +616,6 @@ static const cpu_model_str_t cpu_models[] = {
     { NULL }
 };
 
-/* common to win32 and linux */
 void sigar_cpu_model_adjust(sigar_t *sigar, sigar_cpu_info_t *info)
 {
     int len, i;
@@ -739,19 +698,12 @@ int sigar_cpu_mhz_from_model(char *model)
     return mhz;
 }
 
-#if !defined(WIN32) && !defined(NETWARE)
 #include <netdb.h>
-#ifdef SIGAR_HPUX
-#include <nfs/nfs.h>
-#endif
-#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__sun) || defined(DARWIN)
+#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(DARWIN)
 #include <arpa/inet.h>
 #endif
-#if defined(__sun) || defined(SIGAR_HPUX)
-#endif
-#if defined(_AIX) || defined(SIGAR_HPUX) || defined(__OpenBSD__) || defined(__NetBSD__)
+#if defined(__OpenBSD__) || defined(__NetBSD__)
 #include <sys/socket.h>
-#endif
 #endif
 
 int sigar_file2str(const char *fname, char *buffer, int buflen)
@@ -774,14 +726,6 @@ int sigar_file2str(const char *fname, char *buffer, int buflen)
 
     return status;
 }
-
-#ifdef WIN32
-#define vsnprintf _vsnprintf
-#endif
-
-#ifdef WIN32
-#   define rindex strrchr
-#endif
 
 static int proc_module_get_self(void *data, char *name, int len)
 {
@@ -975,11 +919,9 @@ SIGAR_DECLARE(void) sigar_log_impl_file(sigar_t *sigar, void *data,
     fprintf(fp, "[%s] %s\n", log_levels[level], message);
 }
 
-#ifndef WIN32
 sigar_int64_t sigar_time_now_millis(void)
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
     return ((tv.tv_sec * SIGAR_USEC) + tv.tv_usec) / SIGAR_MSEC;
 }
-#endif

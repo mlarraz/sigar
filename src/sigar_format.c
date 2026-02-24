@@ -27,12 +27,8 @@
 #include <errno.h>
 #include <stdio.h>
 
-#ifndef WIN32
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#if defined(__OpenBSD__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(_AIX)
-#include <sys/socket.h>
-#endif
 #include <pwd.h>
 #include <grp.h>
 
@@ -122,8 +118,6 @@ int sigar_user_id_get(sigar_t *sigar, const char *name, int *uid)
     return SIGAR_OK;
 }
 
-#endif /* WIN32 */
-
 static char *sigar_error_string(int err)
 {
     switch (err) {
@@ -159,18 +153,6 @@ SIGAR_DECLARE(char *) sigar_strerror(sigar_t *sigar, int err)
 char *sigar_strerror_get(int err, char *errbuf, int buflen)
 {
     char *buf = NULL;
-#ifdef WIN32
-    DWORD len;
-
-    len = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-                        FORMAT_MESSAGE_IGNORE_INSERTS,
-                        NULL,
-                        err,
-                        MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT), /* force english */
-                        (LPTSTR)errbuf,
-                        (DWORD)buflen,
-                        NULL);
-#else
 
 #if defined(HAVE_STRERROR_R) && defined(HAVE_STRERROR_R_GLIBC)
     /*
@@ -183,15 +165,12 @@ char *sigar_strerror_get(int err, char *errbuf, int buflen)
         buf = "Unknown Error";
     }
 #else
-    /* strerror() is thread safe on solaris and hpux */
     buf = strerror(err);
 #endif
 
     if (buf != NULL) {
         SIGAR_STRNCPY(errbuf, buf, buflen);
     }
-    
-#endif
     return errbuf;
 }
 
@@ -199,10 +178,6 @@ void sigar_strerror_set(sigar_t *sigar, char *msg)
 {
     SIGAR_SSTRCPY(sigar->errbuf, msg);
 }
-
-#ifdef WIN32
-#define vsnprintf _vsnprintf
-#endif
 
 void sigar_strerror_printf(sigar_t *sigar, const char *format, ...)
 {
@@ -352,32 +327,8 @@ SIGAR_DECLARE(int) sigar_net_address_equals(sigar_net_address_t *addr1,
     }
 }
 
-#if defined(SIGAR_USING_MSC6)
-#define sigar_inet_ntop(af, src, dst, size) NULL
-#define sigar_inet_ntop_errno SIGAR_ENOTIMPL
-#elif defined(WIN32)
-static char *sigar_inet_ntop(int af, const void *src, char *dst, int cnt)
-{
-    struct sockaddr_in6 sa; /* note only using this for AF_INET6 */
-
-    memset(&sa, '\0', sizeof(sa));
-    sa.sin6_family = af;
-    memcpy(&sa.sin6_addr, src, sizeof(sa.sin6_addr));
-
-    if (getnameinfo((struct sockaddr *)&sa, sizeof(sa),
-                    dst, cnt, NULL, 0, NI_NUMERICHOST))
-    {
-        return NULL;
-    }
-    else {
-        return dst;
-    }
-}
-#define sigar_inet_ntop_errno GetLastError()
-#else
 #define sigar_inet_ntop inet_ntop
 #define sigar_inet_ntop_errno errno
-#endif
 
 SIGAR_DECLARE(int) sigar_net_address_to_string(sigar_t *sigar,
                                                sigar_net_address_t *address,
@@ -572,11 +523,7 @@ SIGAR_DECLARE(char *) sigar_net_interface_flags_to_string(sigar_uint64_t flags, 
 #undef FLAGS_APPEND
 #undef FLAGS_BUFLEN
 
-#ifdef WIN32
-#define NET_SERVICES_FILE "C:\\windows\\system32\\drivers\\etc\\services"
-#else
 #define NET_SERVICES_FILE "/etc/services"
-#endif
 
 static int net_services_parse(sigar_cache_t *names, char *type)
 {

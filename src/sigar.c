@@ -19,17 +19,10 @@
 #include <errno.h>
 #include <stdio.h>
 
-#ifndef WIN32
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/time.h>
-#endif
-#if defined(__OpenBSD__) || defined(__FreeBSD__)
-#include <netinet/in.h>
-#endif
-#ifndef WIN32
 #include <arpa/inet.h>
-#endif
 #if defined(HAVE_UTMPX_H)
 # include <utmpx.h>
 #elif defined(HAVE_UTMP_H)
@@ -336,16 +329,12 @@ SIGAR_DECLARE(int) sigar_sys_info_get(sigar_t *sigar,
 {
     SIGAR_ZERO(sysinfo);
 
-#ifndef WIN32
     sigar_sys_info_get_uname(sysinfo);
-#endif
 
     sigar_os_sys_info_get(sigar, sysinfo);
 
     return SIGAR_OK;
 }
-
-#ifndef WIN32
 
 #include <sys/utsname.h>
 
@@ -391,8 +380,6 @@ sigar_proc_cred_name_get(sigar_t *sigar, sigar_pid_t pid,
 
     return status;
 }
-
-#endif /* WIN32 */
 
 int sigar_proc_list_create(sigar_proc_list_t *proclist)
 {
@@ -1104,18 +1091,6 @@ SIGAR_DECLARE(int) sigar_who_list_destroy(sigar_t *sigar,
     return SIGAR_OK;
 }
 
-#if defined(NETWARE)
-static char *getpass(const char *prompt)
-{
-    static char password[BUFSIZ];
-
-    fputs(prompt, stderr);
-    fgets((char *)&password, sizeof(password), stdin);
-
-    return (char *)&password;
-}
-#endif
-
 #define WHOCPY(dest, src) \
     SIGAR_SSTRCPY(dest, src); \
     if (sizeof(src) < sizeof(dest)) \
@@ -1188,59 +1163,6 @@ static int sigar_who_utmp(sigar_t *sigar,
     return SIGAR_OK;
 }
 
-#if defined(WIN32)
-
-int sigar_who_list_get_win32(sigar_t *sigar,
-                             sigar_who_list_t *wholist);
-
-SIGAR_DECLARE(int) sigar_who_list_get(sigar_t *sigar,
-                                      sigar_who_list_t *wholist)
-{
-    sigar_who_list_create(wholist);
-
-    /* cygwin ssh */
-    sigar_who_utmp(sigar, wholist);
-
-    sigar_who_list_get_win32(sigar, wholist);
-
-    return SIGAR_OK;
-}
-
-SIGAR_DECLARE(int) sigar_resource_limit_get(sigar_t *sigar,
-                                            sigar_resource_limit_t *rlimit)
-{
-    MEMORY_BASIC_INFORMATION meminfo;
-    memset(rlimit, 0x7fffffff, sizeof(*rlimit));
-
-    if (VirtualQuery((LPCVOID)&meminfo, &meminfo, sizeof(meminfo))) {
-        rlimit->stack_cur =
-            (DWORD)&meminfo - (DWORD)meminfo.AllocationBase;
-        rlimit->stack_max =
-            ((DWORD)meminfo.BaseAddress + meminfo.RegionSize) -
-            (DWORD)meminfo.AllocationBase;
-    }
-
-    rlimit->virtual_memory_max = rlimit->virtual_memory_cur =
-        0x80000000UL;
-
-    return SIGAR_OK;
-}
-
-#elif defined(NETWARE)
-int sigar_resource_limit_get(sigar_t *sigar,
-                             sigar_resource_limit_t *rlimit)
-{
-    return SIGAR_ENOTIMPL;
-}
-
-int sigar_who_list_get(sigar_t *sigar,
-                       sigar_who_list_t *wholist)
-{
-    return SIGAR_ENOTIMPL;
-}
-#else
-
-#ifndef _AIX
 int sigar_who_list_get(sigar_t *sigar,
                        sigar_who_list_t *wholist)
 {
@@ -1256,7 +1178,6 @@ int sigar_who_list_get(sigar_t *sigar,
 
     return SIGAR_OK;
 }
-#endif
 
 static int sigar_get_default_gateway(sigar_t *sigar,
                                      sigar_net_info_t *netinfo)
@@ -1441,10 +1362,8 @@ int sigar_resource_limit_get(sigar_t *sigar,
 
     return SIGAR_OK;
 }
-#endif
 
-#if !defined(WIN32) && !defined(NETWARE) && !defined(DARWIN) && \
-    !defined(__FreeBSD__) && !defined(__OpenBSD__) && !defined(__NetBSD__)
+#ifdef __linux__
 
 /* XXX: prolly will be moving these stuffs into os_net.c */
 #include <sys/ioctl.h>
@@ -1454,42 +1373,7 @@ int sigar_resource_limit_get(sigar_t *sigar,
 #include <sys/sockio.h>
 #endif
 
-#if defined(_AIX) || defined(__osf__) /* good buddies */
-
-#include <net/if_dl.h>
-
-static void hwaddr_aix_lookup(sigar_t *sigar, sigar_net_interface_config_t *ifconfig)
-{
-    char *ent, *end;
-    struct ifreq *ifr;
-
-    /* XXX: assumes sigar_net_interface_list_get has been called */
-    end = sigar->ifconf_buf + sigar->ifconf_len;
-
-    for (ent = sigar->ifconf_buf;
-         ent < end;
-         ent += sizeof(*ifr))
-    {
-        ifr = (struct ifreq *)ent;
-
-        if (ifr->ifr_addr.sa_family != AF_LINK) {
-            continue;
-        }
-
-        if (strEQ(ifr->ifr_name, ifconfig->name)) {
-            struct sockaddr_dl *sdl = (struct sockaddr_dl *)&ifr->ifr_addr;
-
-            sigar_net_address_mac_set(ifconfig->hwaddr,
-                                      LLADDR(sdl),
-                                      sdl->sdl_alen);
-            return;
-        }
-    }
-
-    sigar_hwaddr_set_null(ifconfig);
-}
-
-#elif !defined(SIOCGIFHWADDR)
+#if !defined(SIOCGIFHWADDR)
 
 #include <net/if_arp.h>
 
@@ -1708,10 +1592,6 @@ int sigar_net_interface_config_get(sigar_t *sigar, const char *name,
                                       ifr.ifr_hwaddr.sa_data,
                                       IFHWADDRLEN);
         }
-#elif defined(_AIX) || defined(__osf__)
-        hwaddr_aix_lookup(sigar, ifconfig);
-        SIGAR_SSTRCPY(ifconfig->type,
-                      SIGAR_NIC_ETHERNET);
 #else
         hwaddr_arp_lookup(ifconfig, sock);
         SIGAR_SSTRCPY(ifconfig->type,
@@ -1719,7 +1599,7 @@ int sigar_net_interface_config_get(sigar_t *sigar, const char *name,
 #endif
     }
 
-#if defined(SIOCGLIFMTU) && !defined(__hpux)
+#if defined(SIOCGLIFMTU)
     {
         struct lifreq lifr;
         SIGAR_SSTRCPY(lifr.lifr_name, name);
@@ -1729,11 +1609,7 @@ int sigar_net_interface_config_get(sigar_t *sigar, const char *name,
     }
 #elif defined(SIOCGIFMTU)
     if (!ioctl(sock, SIOCGIFMTU, &ifr)) {
-#  if defined(__hpux)
-        ifconfig->mtu = ifr.ifr_metric;
-#  else
         ifconfig->mtu = ifr.ifr_mtu;
-#endif
     }
 #else
     ifconfig->mtu = 0; /*XXX*/
@@ -1766,23 +1642,7 @@ int sigar_net_interface_config_get(sigar_t *sigar, const char *name,
     return SIGAR_OK;
 }
 
-#ifdef _AIX
-#  define MY_SIOCGIFCONF CSIOCGIFCONF
-#else
-#  define MY_SIOCGIFCONF SIOCGIFCONF
-#endif
-
-#ifdef __osf__
-static int sigar_netif_configured(sigar_t *sigar, char *name)
-{
-    int status;
-    sigar_net_interface_config_t ifconfig;
-
-    status = sigar_net_interface_config_get(sigar, name, &ifconfig);
-
-    return status == SIGAR_OK;
-}
-#endif
+#define MY_SIOCGIFCONF SIOCGIFCONF
 
 #ifdef __linux__
 static SIGAR_INLINE int has_interface(sigar_net_interface_list_t *iflist,
@@ -1900,22 +1760,6 @@ int sigar_net_interface_list_get(sigar_t *sigar,
 
     ifr = ifc.ifc_req;
     for (n = 0; n < ifc.ifc_len; n += sizeof(struct ifreq), ifr++) {
-#if defined(_AIX) || defined(__osf__) /* pass the bourbon */
-        if (ifr->ifr_addr.sa_family != AF_LINK) {
-            /* XXX: dunno if this is right.
-             * otherwise end up with two 'en0' and three 'lo0'
-             * with the same ip address.
-             */
-            continue;
-        }
-#   ifdef __osf__
-        /* weed out "sl0", "tun0" and the like */
-        /* XXX must be a better way to check this */
-        if (!sigar_netif_configured(sigar, ifr->ifr_name)) {
-            continue;
-        }
-#   endif        
-#endif
         iflist->data[iflist->number++] =
             sigar_strdup(ifr->ifr_name);
     }
@@ -1927,7 +1771,7 @@ int sigar_net_interface_list_get(sigar_t *sigar,
     return SIGAR_OK;
 }
 
-#endif /* WIN32 */
+#endif /* __linux__ */
 
 SIGAR_DECLARE(int)
 sigar_net_interface_config_primary_get(sigar_t *sigar,
@@ -2017,17 +1861,6 @@ struct hostent *sigar_gethostbyname(const char *name,
     gethostbyname_r(name, &data->hs,
                     data->buffer, sizeof(data->buffer),
                     &hp, &data->error);
-#elif defined(__sun)
-    hp = gethostbyname_r(name, &data->hs,
-                         data->buffer, sizeof(data->buffer),
-                         &data->error);
-#elif defined(SIGAR_HAS_HOSTENT_DATA)
-    if (gethostbyname_r(name, &data->hs, &data->hd) == 0) {
-        hp = &data->hs;
-    }
-    else {
-        data->error = h_errno;
-    }
 #else
     hp = gethostbyname(name);
 #endif
@@ -2046,20 +1879,6 @@ static struct hostent *sigar_gethostbyaddr(const char *addr,
                     &data->hs,
                     data->buffer, sizeof(data->buffer),
                     &hp, &data->error);
-#elif defined(__sun)
-    hp = gethostbyaddr_r(addr, len, type,
-                         &data->hs,
-                         data->buffer, sizeof(data->buffer),
-                         &data->error);
-#elif defined(SIGAR_HAS_HOSTENT_DATA)
-    if (gethostbyaddr_r((char *)addr, len, type,
-                        &data->hs, &data->hd) == 0)
-    {
-        hp = &data->hs;
-    }
-    else {
-        data->error = h_errno;
-    }
 #else
     if (!(hp = gethostbyaddr(addr, len, type))) {
         data->error = h_errno;
@@ -2083,14 +1902,6 @@ SIGAR_DECLARE(int) sigar_fqdn_get(sigar_t *sigar, char *name, int namelen)
     sigar_hostent_t data;
     struct hostent *p;
     char domain[SIGAR_FQDN_LEN + 1];
-#ifdef WIN32
-    int status = sigar_wsa_init(sigar);
-
-    if (status != SIGAR_OK) {
-        return status;
-    }
-#endif
-
     if (gethostname(name, namelen - 1) != 0) {
         sigar_log_printf(sigar, SIGAR_LOG_ERROR,
                          "[fqdn] gethostname failed: %s",
@@ -2221,8 +2032,7 @@ SIGAR_DECLARE(int) sigar_fqdn_get(sigar_t *sigar, char *name, int namelen)
     sigar_log(sigar, SIGAR_LOG_DEBUG,
               "[fqdn] unresolved using gethostbyname.h_addr_list");
 
-#if !defined(WIN32) && !defined(NETWARE)
-    if (!IS_FQDN(name) && /* e.g. aix gethostname is already fqdn */
+    if (!IS_FQDN(name) &&
         (getdomainname(domain, sizeof(domain) - 1) == 0) &&
         (domain[0] != '\0') &&
         (domain[0] != '('))  /* linux default is "(none)" */
@@ -2242,7 +2052,6 @@ SIGAR_DECLARE(int) sigar_fqdn_get(sigar_t *sigar, char *name, int namelen)
         sigar_log(sigar, SIGAR_LOG_DEBUG,
                   "[fqdn] getdomainname failed");
     }
-#endif
 
     if (!IS_FQDN(name)) {
         fqdn_ip_get(sigar, name);
@@ -2255,147 +2064,13 @@ SIGAR_DECLARE(int) sigar_fqdn_get(sigar_t *sigar, char *name, int namelen)
 #define MAX_STRING_LEN 8192
 #endif
 
-#ifdef WIN32
-/* The windows version of getPasswordNative was lifted from apr */
-SIGAR_DECLARE(char *) sigar_password_get(const char *prompt)
-{
-    static char password[MAX_STRING_LEN];
-    int n = 0;
-    int ch;
-
-    fputs(prompt, stderr);
-    fflush(stderr);
-
-    while ((ch = _getch()) != '\r') {
-        if (ch == EOF) /* EOF */ {
-            return NULL;
-        }
-        else if (ch == 0 || ch == 0xE0) {
-            /* FN Keys (0 or E0) are a sentinal for a FN code */ 
-            ch = (ch << 4) | _getch();
-            /* Catch {DELETE}, {<--}, Num{DEL} and Num{<--} */
-            if ((ch == 0xE53 || ch == 0xE4B || ch == 0x053 || ch == 0x04b) && n) {
-                password[--n] = '\0';
-                fputs("\b \b", stderr);
-                fflush(stderr);
-            }
-            else {
-                fputc('\a', stderr);
-                fflush(stderr);
-            }
-        }
-        else if ((ch == '\b' || ch == 127) && n) /* BS/DEL */ {
-            password[--n] = '\0';
-            fputs("\b \b", stderr);
-            fflush(stderr);
-        }
-        else if (ch == 3) /* CTRL+C */ {
-            /* _getch() bypasses Ctrl+C but not Ctrl+Break detection! */
-            fputs("^C\n", stderr);
-            fflush(stderr);
-            exit(-1);
-        }
-        else if (ch == 26) /* CTRL+Z */ {
-            fputs("^Z\n", stderr);
-            fflush(stderr);
-            return NULL;
-        }
-	else if (ch == 27) /* ESC */ {
-            fputc('\n', stderr);
-            fputs(prompt, stderr);
-            fflush(stderr);
-            n = 0;
-        }
-        else if ((n < sizeof(password) - 1) && !iscntrl(ch)) {
-            password[n++] = ch;
-            fputc(' ', stderr);
-            fflush(stderr);
-        }
-	else {
-            fputc('\a', stderr);
-            fflush(stderr);
-        }
-    }
- 
-    fputc('\n', stderr);
-    fflush(stderr);
-    password[n] = '\0';
-
-    return password;
-}
-
-#else
-
-/* linux/hpux/solaris getpass() prototype lives here */
 #include <unistd.h>
 
 #include <termios.h>
 
-/* from apr_getpass.c */
-
-#if defined(SIGAR_HPUX)
-#   define getpass termios_getpass
-#elif defined(SIGAR_SOLARIS)
-#   define getpass getpassphrase
-#endif
-
-#ifdef SIGAR_HPUX
-static char *termios_getpass(const char *prompt)
-{
-    struct termios attr;
-    static char password[MAX_STRING_LEN];
-    unsigned int n=0;
-
-    fputs(prompt, stderr);
-    fflush(stderr);
-        
-    if (tcgetattr(STDIN_FILENO, &attr) != 0) {
-        return NULL;
-    }
-
-    attr.c_lflag &= ~(ECHO);
-
-    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &attr) != 0) {
-        return NULL;
-    }
-
-    while ((password[n] = getchar()) != '\n') {
-        if (n < (sizeof(password) - 1) && 
-            (password[n] >= ' ') && 
-            (password[n] <= '~'))
-        {
-            n++;
-        }
-        else {
-            fprintf(stderr, "\n");
-            fputs(prompt, stderr);
-            fflush(stderr);
-            n = 0;
-        }
-    }
- 
-    password[n] = '\0';
-    printf("\n");
-
-    if (n > (MAX_STRING_LEN - 1)) {
-        password[MAX_STRING_LEN - 1] = '\0';
-    }
-
-    attr.c_lflag |= ECHO;
-    tcsetattr(STDIN_FILENO, TCSANOW, &attr);
-
-    return (char *)&password;
-}
-#endif
-
 SIGAR_DECLARE(char *) sigar_password_get(const char *prompt)
 {
     char *buf = NULL;
-
-    /* the linux version of getpass prints the prompt to the tty; ok.
-     * the solaris version prints the prompt to stderr; not ok.
-     * so print the prompt to /dev/tty ourselves if possible (always should be)
-     */
 
     FILE *tty = NULL;
 
@@ -2409,5 +2084,3 @@ SIGAR_DECLARE(char *) sigar_password_get(const char *prompt)
 
     return buf;
 }
-
-#endif /* WIN32 */
