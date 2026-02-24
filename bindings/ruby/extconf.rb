@@ -31,9 +31,6 @@ when /darwin/
   end
   $CPPFLAGS += ' -DDARWIN'
   $LDFLAGS += ' -framework CoreServices -framework IOKit'
-when /bsd/
-  os = 'darwin'
-  have_library("kvm")
 when /linux/
   os = 'linux'
   if have_header("sys/sysmacros.h")
