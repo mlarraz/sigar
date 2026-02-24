@@ -26,12 +26,10 @@
 #include <string.h>
 #include <ctype.h>
 
-#ifndef WIN32
 #include <unistd.h>
 #include <stddef.h>
 #ifndef DARWIN
 #include <strings.h>
-#endif
 #endif
 
 #ifdef DMALLOC
@@ -71,9 +69,7 @@
    sigar_cache_t *net_services_udp;\
    sigar_cache_t *proc_io
 
-#if defined(WIN32)
-#   define SIGAR_INLINE __inline
-#elif defined(__GNUC__)
+#if defined(__GNUC__)
 #   define SIGAR_INLINE inline
 #else
 #   define SIGAR_INLINE
@@ -84,11 +80,7 @@
 #define sigar_strdup(s) \
     dmalloc_strndup(__FILE__, __LINE__, (s), -1, 0)
 #else
-#  ifdef WIN32
-#    define sigar_strdup(s) _strdup(s)
-#  else
-#    define sigar_strdup(s) strdup(s)
-#  endif
+#  define sigar_strdup(s) strdup(s)
 #endif
 
 #define SIGAR_ZERO(s) \
@@ -109,11 +101,6 @@
 
 #ifndef strnEQ
 #define strnEQ(s1, s2, n) (strncmp(s1, s2, n) == 0)
-#endif
-
-#ifdef WIN32
-#define strcasecmp stricmp
-#define strncasecmp strnicmp
 #endif
 
 #ifndef strcaseEQ
@@ -403,27 +390,17 @@ int sigar_get_iftype(const char *name, int *type, int *inst);
 #define SIGAR_NIC_EC       "Econet"
 #define PID_CACHE_CLEANUP_PERIOD 1000*60*10 /* 10 minutes */
 #define PID_CACHE_ENTRY_EXPIRE_PERIOD 1000*60*20 /* 20 minutes */
-#ifndef WIN32
 #include <netdb.h>
-#endif
 
 #define PROC_PID_CPU_CACHE 1
 #define PROC_PID_IO_CACHE 2
 
 #define SIGAR_HOSTENT_LEN 1024
-#if defined(_AIX)
-#define SIGAR_HAS_HOSTENT_DATA
-#endif
 
 typedef struct {
     char buffer[SIGAR_HOSTENT_LEN];
     int error;
-#ifndef WIN32
     struct hostent hs;
-#endif
-#ifdef SIGAR_HAS_HOSTENT_DATA
-    struct hostent_data hd;
-#endif
 } sigar_hostent_t;
 
 #endif

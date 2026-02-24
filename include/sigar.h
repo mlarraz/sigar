@@ -85,22 +85,11 @@ typedef long long sigar_int64_t;
 #define SIGAR_ENOTIMPL       (SIGAR_START_ERROR + 1)
 #define SIGAR_OS_START_ERROR (SIGAR_START_ERROR*2)
 
-#ifdef WIN32
-#   define SIGAR_ENOENT ERROR_FILE_NOT_FOUND
-#   define SIGAR_EACCES ERROR_ACCESS_DENIED
-#   define SIGAR_ENXIO  ERROR_BAD_DRIVER_LEVEL
-#else
-#   define SIGAR_ENOENT ENOENT
-#   define SIGAR_EACCES EACCES
-#   define SIGAR_ENXIO  ENXIO
-#endif
+#define SIGAR_ENOENT ENOENT
+#define SIGAR_EACCES EACCES
+#define SIGAR_ENXIO  ENXIO
 
-#ifdef WIN32
-#   define SIGAR_DECLARE(type) \
-        __declspec(dllexport) type __stdcall
-#else
-#   define SIGAR_DECLARE(type) type
-#endif
+#define SIGAR_DECLARE(type) type
 
 #if defined(PATH_MAX)
 #   define SIGAR_PATH_MAX PATH_MAX
@@ -110,16 +99,10 @@ typedef long long sigar_int64_t;
 #   define SIGAR_PATH_MAX 4096
 #endif
 
-#ifdef WIN32
-typedef sigar_uint64_t sigar_pid_t;
-typedef unsigned long sigar_uid_t;
-typedef unsigned long sigar_gid_t;
-#else
 #include <sys/types.h>
 typedef pid_t sigar_pid_t;
 typedef uid_t sigar_uid_t;
 typedef gid_t sigar_gid_t;
-#endif
 
 typedef struct sigar_t sigar_t;
 
